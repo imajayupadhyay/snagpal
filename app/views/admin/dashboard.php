@@ -43,7 +43,7 @@
     </div>
 
     <div class="dash-foot">
-      <form method="post" action="<?= e(url_path('admin/logout.php')) ?>">
+      <form method="post" action="<?= e(url_path('sanchalak/logout.php')) ?>">
         <?= csrf_field() ?>
         <button class="ghost-btn" type="submit">Logout</button>
       </form>

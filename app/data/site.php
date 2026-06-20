@@ -23,6 +23,7 @@ return [
         ],
     ],
     'navigation' => [
+        ['label' => 'About Shweta', 'href' => '/about-shweta/', 'class' => 'nav-about'],
         ['label' => 'Expertise', 'href' => '#expertise'],
         ['label' => 'Focus Areas', 'href' => '#focus'],
         ['label' => 'Research', 'href' => '#research'],

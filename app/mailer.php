@@ -346,7 +346,7 @@ function notify_booking_requested(array $booking): void
     $adminEmail = (string) ($cfg['admin_address'] ?? '');
 
     if ($adminEmail !== '') {
-        $adminUrl = (string) ($GLOBALS['config']['url'] ?? '') . url_path('admin/bookings/');
+        $adminUrl = (string) ($GLOBALS['config']['url'] ?? '') . url_path('sanchalak/bookings/');
         $adminHtml = email_layout(
             'New meeting request',
             'Action needed',

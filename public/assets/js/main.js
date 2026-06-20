@@ -33,8 +33,8 @@
 
   /* loader */
   var loader=document.getElementById('loader'),countEl=document.getElementById('count'),bar=document.getElementById('lbar');
-  function reveals(){document.querySelectorAll('.hero .reveal').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},90*i);});
-    document.querySelectorAll('.hero .clip').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},150+130*i);});
+  function reveals(){document.querySelectorAll('.hero .reveal, .about-hero .reveal').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},90*i);});
+    document.querySelectorAll('.hero .clip, .about-hero .clip').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},150+130*i);});
     var hi=document.getElementById('heroImg');if(hi)hi.classList.add('in');}
   function finish(){document.body.classList.remove('loading');loader.classList.add('done');setTimeout(reveals,260);}
   if(reduce){countEl.textContent='100';bar.style.width='100%';finish();}
@@ -74,6 +74,55 @@
   applyTheme(root.getAttribute('data-theme')||'light');
   if(tbtn){tbtn.addEventListener('click',function(){
     applyTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');});}
+
+  /* mobile navigation */
+  var menuButton=document.getElementById('menuToggle');
+  var mobileMenu=document.getElementById('mobileMenu');
+  function setMenu(open){
+    if(!menuButton||!mobileMenu){
+      return;
+    }
+
+    mobileMenu.hidden=!open;
+    menuButton.setAttribute('aria-expanded',open?'true':'false');
+    menuButton.setAttribute('aria-label',open?'Close menu':'Open menu');
+    document.body.classList.toggle('menu-open',open);
+  }
+
+  function menuIsOpen(){
+    return !!(mobileMenu&&!mobileMenu.hidden);
+  }
+
+  if(menuButton&&mobileMenu){
+    menuButton.addEventListener('click',function(){
+      setMenu(!menuIsOpen());
+    });
+
+    mobileMenu.querySelectorAll('a,button').forEach(function(item){
+      item.addEventListener('click',function(){
+        setMenu(false);
+      });
+    });
+
+    document.addEventListener('click',function(event){
+      if(menuIsOpen()&&nav&&!nav.contains(event.target)){
+        setMenu(false);
+      }
+    });
+
+    document.addEventListener('keydown',function(event){
+      if(event.key==='Escape'&&menuIsOpen()){
+        setMenu(false);
+        menuButton.focus();
+      }
+    });
+
+    window.addEventListener('resize',function(){
+      if(window.innerWidth>600&&menuIsOpen()){
+        setMenu(false);
+      }
+    });
+  }
 
   /* meeting booking modal */
   var modal=document.getElementById('meetingModal');

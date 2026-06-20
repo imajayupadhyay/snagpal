@@ -42,7 +42,7 @@ ob_start();
       <div class="top-actions">
         <a class="ghost-link" href="<?= e(admin_bookings_url()) ?>">View Bookings</a>
         <a class="ghost-link" href="<?= e(url_path()) ?>" target="_blank" rel="noopener">View Site</a>
-        <form method="post" action="<?= e(url_path('admin/logout.php')) ?>">
+        <form method="post" action="<?= e(url_path('sanchalak/logout.php')) ?>">
           <?= csrf_field() ?>
           <button class="ghost-btn" type="submit">Logout</button>
         </form>

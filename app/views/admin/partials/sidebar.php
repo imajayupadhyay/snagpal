@@ -35,7 +35,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5H5V5h5"/></svg>
       <span>View site</span>
     </a>
-    <form method="post" action="<?= e(url_path('admin/logout.php')) ?>">
+    <form method="post" action="<?= e(url_path('sanchalak/logout.php')) ?>">
       <?= csrf_field() ?>
       <button class="nav-item" type="submit">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg>

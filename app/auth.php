@@ -59,27 +59,27 @@ function admin_login_url(): string
 
 function admin_dashboard_url(): string
 {
-    return url_path('admin/');
+    return url_path('sanchalak/dashboard/');
 }
 
 function admin_homepage_url(): string
 {
-    return url_path('admin/homepage/');
+    return url_path('sanchalak/homepage/');
 }
 
 function admin_schedule_url(): string
 {
-    return url_path('admin/schedule/');
+    return url_path('sanchalak/schedule/');
 }
 
 function admin_bookings_url(): string
 {
-    return url_path('admin/bookings/');
+    return url_path('sanchalak/bookings/');
 }
 
 function admin_users_url(): string
 {
-    return url_path('admin/users/');
+    return url_path('sanchalak/users/');
 }
 
 function current_admin(): ?array
