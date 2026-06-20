@@ -1,0 +1,21 @@
+# Environment / secrets — never commit
+.env
+
+# PHP session files
+/storage/sessions/*
+!/storage/sessions/.gitkeep
+
+# Admin-uploaded media (user content)
+/public/uploads/*
+!/public/uploads/.gitkeep
+!/public/uploads/homepage/.gitkeep
+
+# Logs
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
