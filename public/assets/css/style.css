@@ -798,7 +798,7 @@
     .mobile-menu-link,.mobile-menu-link.cta{font-size:1.05rem;padding:0.75rem 0.85rem}
 
     /* hero: taller headline, natural flow, full-width framed portrait */
-    .hero{min-height:auto;padding:clamp(6.5rem,21vh,8rem) var(--pad) clamp(2.6rem,8vh,3.6rem)}
+    .hero{min-height:auto;padding:clamp(5.2rem,15vh,6.4rem) var(--pad) clamp(2.6rem,8vh,3.6rem)}
     .hero-grid{gap:0}
     .hero .kick{margin-bottom:1.1rem}
     .hero h1{font-size:clamp(3.1rem,15.5vw,4.8rem)}
@@ -812,7 +812,7 @@
     .head{grid-template-columns:1fr;gap:0.6rem}
     .res-row{grid-template-columns:1fr;gap:0.3rem}
     .res-row .kind{text-align:left}
-    .about-hero{padding:clamp(6.4rem,20vh,7.6rem) var(--pad) clamp(2.8rem,8vh,3.8rem)}
+    .about-hero{padding:clamp(5.1rem,15vh,6.2rem) var(--pad) clamp(2.8rem,8vh,3.8rem)}
     .about-hero-grid{gap:2rem}
     .about-hero .kick{margin-bottom:1.15rem}
     .about-hero h1{font-size:clamp(3.1rem,15vw,4.8rem)}
@@ -836,7 +836,7 @@
     .cohorts-archive-grid,.cohort-related-grid{grid-template-columns:1fr}
     .cohorts-featured-panel{max-width:none}
     .cohorts-post-meta{align-items:flex-start;flex-direction:column;gap:0.35rem}
-    .cohort-detail-hero{padding:clamp(6.4rem,20vh,7.6rem) var(--pad) clamp(2.8rem,8vh,3.8rem)}
+    .cohort-detail-hero{padding:clamp(5.1rem,15vh,6.2rem) var(--pad) clamp(2.8rem,8vh,3.8rem)}
     .cohort-detail-copy h1{font-size:clamp(2.7rem,13vw,4.5rem);max-width:none}
     .cohort-watch{padding-top:clamp(2rem,7vw,3rem)}
     .cohort-article-body h2{font-size:clamp(2rem,10vw,3.25rem)}
@@ -848,7 +848,15 @@
     .event-card-meta em{text-align:left}
     .meeting-modal{padding:0.75rem}
     .meeting-dialog{max-height:92vh}
-    .meeting-grid{grid-template-columns:1fr}
+    .meeting-main{padding:1rem}
+    .meeting-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0.8rem 0.65rem}
+    .meeting-grid label{grid-column:1/-1;min-width:0}
+    .meeting-grid label.meeting-date-field{grid-column:1}
+    .meeting-grid label.meeting-slot-field{grid-column:2}
+    .meeting-grid input,.meeting-grid select{min-width:0;font-size:0.88rem}
+    .meeting-grid input,.meeting-grid select{height:44px;padding:0 0.65rem}
+    .meeting-submit{height:48px;margin-top:1rem}
+    .meeting-fineprint{margin-top:0.7rem}
   }
   @media(max-width:360px){
     .hero .kick{font-size:0.66rem}
@@ -857,6 +865,9 @@
     .mobile-menu-link,.mobile-menu-link.cta{font-size:0.98rem;padding:0.72rem 0.8rem}
     .hero-meta{grid-template-columns:1fr}
     .about-stat-row{grid-template-columns:1fr}
+    .meeting-main{padding:0.85rem}
+    .meeting-grid{gap:0.7rem 0.55rem}
+    .meeting-grid input,.meeting-grid select{font-size:0.82rem;padding:0 0.5rem}
   }
   @media(prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}

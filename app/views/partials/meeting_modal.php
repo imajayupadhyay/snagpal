@@ -56,7 +56,7 @@ $slots = is_array($slots ?? null) ? $slots : [];
           <input class="hp-field" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
 
           <div class="meeting-grid">
-            <label>
+            <label class="meeting-date-field">
               <span>Date</span>
               <input
                 type="date"
@@ -68,7 +68,7 @@ $slots = is_array($slots ?? null) ? $slots : [];
               >
             </label>
 
-            <label>
+            <label class="meeting-slot-field">
               <span>Slot</span>
               <select name="slot_id" required data-meeting-slot>
                 <option value="">Select a date first</option>
