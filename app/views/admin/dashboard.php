@@ -40,6 +40,12 @@
         <p>Edit the recognition ledger, stat row, and editorial standards cards.</p>
         <span class="go">Manage awards page &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_recommendations_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-1.2 4.3L21 20l-4.3-1.2a8.5 8.5 0 1 1 4.3-7.3z"/><path d="M8 10h6M8 13h4"/></svg></span>
+        <h2>Recommendations</h2>
+        <p>Review visitor-submitted recommendations and publish them to the homepage or About page.</p>
+        <span class="go">Review submissions &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(admin_events_url()) ?>">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/><path d="M8 13.5h2M8 17h2M14 13.5h2M14 17h2"/></svg></span>
         <h2>Events</h2>

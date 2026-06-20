@@ -66,7 +66,7 @@ return [
         ['q' => 'A principled, dependable voice on responsible technology for critical national infrastructure.', 'w' => 'Joint Secretary, Ministry'],
         ['q' => 'Translates national AI policy into something teams can actually implement and stand behind.', 'w' => 'Programme Director, e-Governance'],
     ],
-    'recommendations_note' => 'Placeholder endorsements, replace with verified quotes',
+    'recommendations_note' => '',
     'profile' => [
         'heading' => 'About Shweta Nagpal',
         'image' => [

@@ -1,6 +1,7 @@
 <?php
 $meetingSlots = schedule_available_slots();
 $meetingFlash = public_flash('meeting_booking');
+$recommendationFlash = public_flash('recommendation_submission');
 ?>
 <!DOCTYPE html>
 <html lang="<?= e($page['lang'] ?? 'en') ?>">
@@ -29,10 +30,11 @@ $meetingFlash = public_flash('meeting_booking');
 
 <?php render('partials/footer', ['site' => $site]); ?>
 <?php render('partials/meeting_modal', ['slots' => $meetingSlots, 'flash' => $meetingFlash]); ?>
+<?php render('partials/recommendation_modal', ['flash' => $recommendationFlash]); ?>
 
 <script>
 window.portfolioData = <?= json_encode([
-    'recommendations' => $site['recommendations'],
+    'recommendations' => $site['about_page']['recommendations'] ?? $site['recommendations'],
     'topics' => $site['topics'],
     'quotes' => $site['quotes'],
     'meetingSlots' => $meetingSlots,

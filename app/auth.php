@@ -96,6 +96,13 @@ function admin_awards_url(): string
     return url_path('sanchalak/awards/');
 }
 
+function admin_recommendations_url(array $query = []): string
+{
+    $url = url_path('sanchalak/recommendations/');
+
+    return $query === [] ? $url : $url . '?' . http_build_query($query);
+}
+
 function admin_schedule_url(): string
 {
     return url_path('sanchalak/schedule/');

@@ -138,7 +138,29 @@ ob_start();
       <section class="panel form-panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">3. Profile</p>
+            <p class="eyebrow">3. Recommendations</p>
+            <h2>Quote Marquee</h2>
+          </div>
+        </div>
+        <p class="hint">Scrolling quote strip shown right after the hero. Leave a row's quote blank to remove it.</p>
+        <div class="repeat-list">
+          <?php foreach ($rows($pageContent['recommendations'], 1) as $item): ?>
+            <div class="repeat-row two-col">
+              <textarea name="recommendations[q][]" rows="2" placeholder="Quote"><?= e($item['q'] ?? '') ?></textarea>
+              <input name="recommendations[w][]" placeholder="Who (e.g. Chief Engineer, Power Utility)" value="<?= e($item['w'] ?? '') ?>" maxlength="120">
+            </div>
+          <?php endforeach; ?>
+        </div>
+        <div class="field compact">
+          <label for="recommendations_note">Footer note</label>
+          <input id="recommendations_note" name="recommendations_note" value="<?= e($pageContent['recommendations_note']) ?>" maxlength="160">
+        </div>
+      </section>
+
+      <section class="panel form-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">4. Profile</p>
             <h2>Story &amp; Fact Tiles</h2>
           </div>
         </div>
@@ -190,7 +212,7 @@ ob_start();
       <section class="panel form-panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">4. Work &amp; Mandate</p>
+            <p class="eyebrow">5. Work &amp; Mandate</p>
             <h2>Four Cards</h2>
           </div>
         </div>
@@ -213,7 +235,7 @@ ob_start();
       <section class="panel form-panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">5. Operating Principles</p>
+            <p class="eyebrow">6. Operating Principles</p>
             <h2>Quote &amp; Focus Cards</h2>
           </div>
         </div>
@@ -245,7 +267,7 @@ ob_start();
       <section class="panel form-panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">6. Expertise</p>
+            <p class="eyebrow">7. Expertise</p>
             <h2>Expertise Rows</h2>
           </div>
         </div>
@@ -268,7 +290,7 @@ ob_start();
       <section class="panel form-panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">7. Research &amp; Engagement</p>
+            <p class="eyebrow">8. Research &amp; Engagement</p>
             <h2>Media &amp; Rows</h2>
           </div>
         </div>
@@ -312,7 +334,7 @@ ob_start();
       <section class="panel form-panel">
         <div class="panel-head">
           <div>
-            <p class="eyebrow">8. Closing</p>
+            <p class="eyebrow">9. Closing</p>
             <h2>Schedule a Meet Banner</h2>
           </div>
         </div>

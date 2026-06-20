@@ -343,6 +343,133 @@
     }
   }
 
+  /* give-a-recommendation modal */
+  var recModal=document.getElementById('recommendationModal');
+  if(recModal){
+    var recOpeners=document.querySelectorAll('[data-recommend-open]');
+    var recClosers=recModal.querySelectorAll('[data-recommend-close]');
+    var recDialog=recModal.querySelector('.meeting-dialog');
+    var recForm=recModal.querySelector('#recommendationForm');
+    var recAlert=recModal.querySelector('[data-recommend-alert]');
+    var recSubmit=recForm?recForm.querySelector('.meeting-submit'):null;
+    var recLastFocus=null;
+
+    function showRecMessage(type,messages){
+      if(!recAlert){
+        return;
+      }
+
+      var list=Array.isArray(messages)?messages:[messages];
+      recAlert.className='meeting-alert '+(type==='success'?'success':'error');
+      recAlert.setAttribute('role',type==='success'?'status':'alert');
+      recAlert.innerHTML=list.map(function(message){return '<p>'+esc(message||'Unable to complete the request.')+'</p>';}).join('');
+      recAlert.hidden=false;
+    }
+
+    function setRecSubmitting(isSubmitting){
+      if(!recSubmit){
+        return;
+      }
+
+      if(isSubmitting){
+        recSubmit.dataset.label=recSubmit.textContent;
+        recSubmit.textContent='Submitting...';
+        recSubmit.disabled=true;
+        return;
+      }
+
+      recSubmit.textContent=recSubmit.dataset.label||'Submit Recommendation';
+      recSubmit.disabled=false;
+    }
+
+    function openRecModal(){
+      recLastFocus=document.activeElement;
+      recModal.hidden=false;
+      recModal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-open');
+      setTimeout(function(){
+        var target=recModal.querySelector('input:not([type="hidden"]):not(.hp-field),select,textarea,button');
+        if(target){target.focus();}
+      },30);
+    }
+
+    function closeRecModal(){
+      recModal.hidden=true;
+      recModal.setAttribute('aria-hidden','true');
+      document.body.classList.remove('modal-open');
+      if(recLastFocus&&typeof recLastFocus.focus==='function'){
+        recLastFocus.focus();
+      }
+    }
+
+    recOpeners.forEach(function(opener){
+      opener.addEventListener('click',function(event){
+        event.preventDefault();
+        openRecModal();
+      });
+    });
+
+    recClosers.forEach(function(closer){
+      closer.addEventListener('click',closeRecModal);
+    });
+
+    document.addEventListener('keydown',function(event){
+      if(event.key==='Escape'&&!recModal.hidden){
+        closeRecModal();
+      }
+    });
+
+    if(recDialog){
+      recDialog.addEventListener('click',function(event){
+        event.stopPropagation();
+      });
+    }
+
+    if(recForm&&window.fetch){
+      recForm.addEventListener('submit',function(event){
+        event.preventDefault();
+
+        setRecSubmitting(true);
+
+        fetch(recForm.action,{
+          method:'POST',
+          body:new FormData(recForm),
+          headers:{
+            'Accept':'application/json',
+            'X-Requested-With':'XMLHttpRequest'
+          },
+          credentials:'same-origin'
+        })
+          .then(function(response){
+            return response.json().then(function(payload){
+              payload.httpOk=response.ok;
+              return payload;
+            });
+          })
+          .then(function(payload){
+            if(payload.ok){
+              showRecMessage('success',[payload.message||'Thank you. Your recommendation has been submitted.']);
+              recForm.reset();
+              if(recAlert){recAlert.focus&&recAlert.focus();}
+              return;
+            }
+
+            showRecMessage('error',payload.errors||['Unable to submit your recommendation. Please try again.']);
+          })
+          .catch(function(){
+            showRecMessage('error',['Unable to submit without refreshing. Please try again.']);
+          })
+          .finally(function(){
+            setRecSubmitting(false);
+          });
+      });
+    }
+
+    if(recModal.getAttribute('data-auto-open')==='true'){
+      openRecModal();
+    }
+  }
+
   /* nav shrink */
   var nav=document.getElementById('nav');
   window.addEventListener('scroll',function(){nav.classList.toggle('shrink',window.scrollY>50);},{passive:true});

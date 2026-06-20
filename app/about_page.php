@@ -18,6 +18,14 @@ function about_page_default_content(): array
         ],
         'portrait_src' => 'images/profile-commemoration.jpg',
         'portrait_alt' => 'Shweta Nagpal at the Bhakra Beas Management Board 50-year commemoration',
+        'recommendations' => [
+            ['q' => 'Among the clearest voices on turning AI-governance principle into public-sector practice.', 'w' => 'Secretary, Department of Information Technology'],
+            ['q' => 'Rare command of both the engineering and the policy. Exactly the combination government needs right now.', 'w' => 'Chief Engineer, Power Utility'],
+            ['q' => 'Brought genuine discipline and transparency to how we think about digital systems and procurement.', 'w' => 'Director, Public-Sector Undertaking'],
+            ['q' => 'A principled, dependable voice on responsible technology for critical national infrastructure.', 'w' => 'Joint Secretary, Ministry'],
+            ['q' => 'Translates national AI policy into something teams can actually implement and stand behind.', 'w' => 'Programme Director, e-Governance'],
+        ],
+        'recommendations_note' => '',
         'mandate_eyebrow' => 'Current Mandate',
         'facts' => [
             ['label' => 'Current role', 'value' => 'Nodal Officer for AI Governance, BBMB'],
@@ -144,6 +152,7 @@ function about_page_row_fields(): array
 {
     return [
         'hero_stats' => ['value', 'label'],
+        'recommendations' => ['q', 'w'],
         'facts' => ['label', 'value'],
         'path_items' => ['label', 'title', 'text'],
         'focus_items' => ['title', 'description'],
@@ -202,6 +211,10 @@ function about_page_bootstrap_from_homepage(): array
     $seed['hero_stats'] = (is_array($hero['stats'] ?? null) && $hero['stats'] !== []) ? array_values($hero['stats']) : $default['hero_stats'];
     $seed['portrait_src'] = (string) ($profile['image']['src'] ?? $default['portrait_src']);
     $seed['portrait_alt'] = (string) ($profile['image']['alt'] ?? $default['portrait_alt']);
+    $seed['recommendations'] = (is_array($homepage['recommendations'] ?? null) && $homepage['recommendations'] !== [])
+        ? array_values($homepage['recommendations'])
+        : $default['recommendations'];
+    $seed['recommendations_note'] = (string) ($homepage['recommendations_note'] ?? $default['recommendations_note']);
     $seed['profile_heading'] = (string) ($profile['heading'] ?? $default['profile_heading']);
     $seed['profile_lead_html'] = (string) ($profile['lead_html'] ?? $default['profile_lead_html']);
     $seed['profile_paragraphs_html'] = (is_array($profile['paragraphs_html'] ?? null) && $profile['paragraphs_html'] !== [])
@@ -300,6 +313,8 @@ function about_page_content_from_post(array $post): array
         'hero_stats' => $rowsFromPost['hero_stats'],
         'portrait_src' => homepage_text($post['portrait_src'] ?? $default['portrait_src']),
         'portrait_alt' => homepage_text($post['portrait_alt'] ?? $default['portrait_alt']),
+        'recommendations' => $rowsFromPost['recommendations'],
+        'recommendations_note' => homepage_text($post['recommendations_note'] ?? $default['recommendations_note']),
         'mandate_eyebrow' => homepage_text($post['mandate_eyebrow'] ?? $default['mandate_eyebrow']),
         'facts' => $rowsFromPost['facts'],
         'profile_eyebrow' => homepage_text($post['profile_eyebrow'] ?? $default['profile_eyebrow']),

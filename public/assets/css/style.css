@@ -192,6 +192,8 @@
   .rec p::before{content:"\201C";color:var(--bg);opacity:0.5;font-family:var(--cond);font-size:1.4em;line-height:0;vertical-align:-0.3em;margin-right:0.1em}
   .rec .who{margin-top:1rem;font-family:var(--mono);font-size:0.64rem;letter-spacing:0.08em;text-transform:uppercase;color:#9DC3BB}
   .recs .foot{position:absolute;bottom:0.7rem;right:var(--pad);font-family:var(--mono);font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(234,241,238,0.4)}
+  .recs-cta{position:relative;z-index:2;display:flex;justify-content:flex-end;padding:0 var(--pad) 2.2rem}
+  .recs-cta .about-text-link{background:none;border-width:0;border-bottom:2px solid rgba(255,255,255,0.38);padding:0 0 0.12rem;cursor:pointer;font:inherit}
 
   /* ---------- topic ticker ---------- */
   .topics{padding:0;overflow:hidden;position:relative;background:var(--bg-2);

@@ -49,6 +49,19 @@ $profileParagraphs = array_values($aboutPage['profile_paragraphs_html']);
     <?php endif; ?>
   </header>
 
+  <?php if (! empty($aboutPage['recommendations'])): ?>
+    <section class="recs" aria-label="Recommendations">
+      <span class="lbl">Recommendations</span>
+      <div class="marquee" id="marquee"></div>
+      <div class="recs-cta">
+        <button type="button" class="about-text-link light" data-recommend-open>Give a Recommendation</button>
+      </div>
+      <?php if (! empty($aboutPage['recommendations_note'])): ?>
+        <span class="foot"><?= e($aboutPage['recommendations_note']) ?></span>
+      <?php endif; ?>
+    </section>
+  <?php endif; ?>
+
   <section class="about-story">
     <div class="about-story-grid">
       <div class="about-story-heading">
