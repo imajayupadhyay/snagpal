@@ -28,6 +28,18 @@
         <p>Create and manage cohort posts with video, excerpts, article content, links, and publish status.</p>
         <span class="go">Manage cohorts &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_about_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c.7-3.6 3.4-5.6 7-5.6s6.3 2 7 5.6"/></svg></span>
+        <h2>About Page</h2>
+        <p>Edit the profile facts, "Work &amp; Mandate" cards, and the operating principles heading.</p>
+        <span class="go">Manage about page &rarr;</span>
+      </a>
+      <a class="launch-card" href="<?= e(admin_awards_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 7.5 21l4.5-2.5 4.5 2.5L15 13.5"/></svg></span>
+        <h2>Awards Page</h2>
+        <p>Edit the recognition ledger, stat row, and editorial standards cards.</p>
+        <span class="go">Manage awards page &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(admin_events_url()) ?>">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/><path d="M8 13.5h2M8 17h2M14 13.5h2M14 17h2"/></svg></span>
         <h2>Events</h2>

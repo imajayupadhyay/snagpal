@@ -86,6 +86,16 @@ function admin_events_url(array $query = []): string
     return $query === [] ? $url : $url . '?' . http_build_query($query);
 }
 
+function admin_about_url(): string
+{
+    return url_path('sanchalak/about/');
+}
+
+function admin_awards_url(): string
+{
+    return url_path('sanchalak/awards/');
+}
+
 function admin_schedule_url(): string
 {
     return url_path('sanchalak/schedule/');

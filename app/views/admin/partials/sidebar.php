@@ -25,6 +25,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="m10 9 5 3-5 3z"/><path d="M4 19l4-4h12"/></svg>
       <span>Cohorts</span>
     </a>
+    <a class="nav-item<?= $active === 'about' ? ' active' : '' ?>" href="<?= e(admin_about_url()) ?>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c.7-3.6 3.4-5.6 7-5.6s6.3 2 7 5.6"/></svg>
+      <span>About</span>
+    </a>
+    <a class="nav-item<?= $active === 'awards' ? ' active' : '' ?>" href="<?= e(admin_awards_url()) ?>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 7.5 21l4.5-2.5 4.5 2.5L15 13.5"/></svg>
+      <span>Awards</span>
+    </a>
     <a class="nav-item<?= $active === 'events' ? ' active' : '' ?>" href="<?= e(admin_events_url()) ?>">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/><path d="M8 13.5h2M8 17h2M14 13.5h2M14 17h2"/></svg>
       <span>Events</span>

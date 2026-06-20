@@ -1,72 +1,38 @@
 <?php
 $identity = $site['identity'];
-$hero = $site['hero'];
-$profile = $site['profile'];
-$focus = $site['focus'];
-$expertise = $site['expertise'];
-$research = $site['research'];
-$schedule = $site['schedule'];
-$quotes = array_values($site['quotes'] ?? []);
-$profileParagraphs = array_values($profile['paragraphs_html'] ?? []);
-$focusItems = array_values($focus['items'] ?? []);
-$expertiseItems = array_values($expertise['items'] ?? []);
-$researchItems = array_values($research['items'] ?? []);
-$researchMedia = array_values($research['media'] ?? []);
-$stats = array_values($hero['stats'] ?? []);
-
-$facts = [
-    ['label' => 'Current role', 'value' => 'Nodal Officer for AI Governance, BBMB'],
-    ['label' => 'Institution', 'value' => 'Bhakra Beas Management Board, Ministry of Power'],
-    ['label' => 'Base', 'value' => $identity['location'] ?? 'Chandigarh, India'],
-    ['label' => 'Academic grounding', 'value' => 'M.Tech, Computer Science Engineering, PEC Chandigarh'],
-];
-
-$pathItems = [
-    [
-        'label' => 'Public technology',
-        'title' => 'Engineering for systems people depend on',
-        'text' => 'At BBMB, Shweta works with the software, data, and infrastructure layer behind critical water and power assets, where reliability, security, and auditability have public consequences.',
-    ],
-    [
-        'label' => 'AI governance',
-        'title' => 'Turning national guidance into institutional practice',
-        'text' => 'As Nodal Officer for AI Governance, she helps translate the IndiaAI Mission and MeitY AI Governance Guidelines into usable adoption pathways, risk thinking, and accountability guardrails.',
-    ],
-    [
-        'label' => 'e-Governance',
-        'title' => 'Digitising process without losing discipline',
-        'text' => 'Her work spans enterprise platforms, procurement systems, eOffice, workflow modernization, and large-scale government digitisation with scrutiny and transparency built in.',
-    ],
-    [
-        'label' => 'Public trust',
-        'title' => 'Technology as governance infrastructure',
-        'text' => 'Her approach treats data, procurement, security, and AI adoption as public responsibilities, not only technical deployments.',
-    ],
-];
+$aboutPage = is_array($site['about_page'] ?? null) ? $site['about_page'] : about_page_default_content();
+$facts = array_values($aboutPage['facts']);
+$pathItems = array_values($aboutPage['path_items']);
+$stats = array_values($aboutPage['hero_stats']);
+$focusItems = array_values($aboutPage['focus_items']);
+$expertiseItems = array_values($aboutPage['expertise_items']);
+$researchItems = array_values($aboutPage['research_items']);
+$researchMedia = array_values($aboutPage['research_media']);
+$profileParagraphs = array_values($aboutPage['profile_paragraphs_html']);
 ?>
 <main class="about-main">
   <header class="about-hero" id="top">
     <div class="about-hero-grid">
       <div class="about-hero-copy">
-        <div class="mono kick reveal">About Shweta <span class="ac">&middot;</span> <?= e($hero['kicker_suffix'] ?? 'Public-Sector Technology') ?></div>
+        <div class="mono kick reveal">About Shweta <span class="ac">&middot;</span> <?= e($aboutPage['kicker_suffix']) ?></div>
         <h1>
-          <span class="clip"><span>About</span></span>
-          <span class="clip"><span class="a">Shweta</span></span>
+          <span class="clip"><span><?= e($aboutPage['heading_line1']) ?></span></span>
+          <span class="clip"><span class="a"><?= e($aboutPage['heading_line2']) ?></span></span>
         </h1>
-        <p class="about-role reveal d2"><?= e($hero['role'] ?? '') ?></p>
-        <p class="about-lede reveal d3"><?= e($hero['lede'] ?? '') ?></p>
+        <p class="about-role reveal d2"><?= e($aboutPage['hero_role']) ?></p>
+        <p class="about-lede reveal d3"><?= e($aboutPage['hero_lede']) ?></p>
         <div class="about-actions reveal d4">
-          <button class="cta" type="button" data-schedule-open><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></button>
+          <button class="cta" type="button" data-schedule-open><?= e($aboutPage['schedule_eyebrow']) ?></button>
         </div>
       </div>
 
       <aside class="about-identity-panel reveal d2" aria-label="Profile summary">
         <div class="about-portrait">
-          <img src="<?= e(asset($profile['image']['src'] ?? 'images/profile-commemoration.jpg')) ?>" alt="<?= e($profile['image']['alt'] ?? $identity['full_name']) ?>" />
+          <img src="<?= e(asset($aboutPage['portrait_src'] ?: 'images/profile-commemoration.jpg')) ?>" alt="<?= e($aboutPage['portrait_alt'] ?: $identity['full_name']) ?>" />
         </div>
         <div class="about-panel-body">
-          <span class="mono">Current Mandate</span>
-          <p><?= e($facts[0]['value']) ?></p>
+          <span class="mono"><?= e($aboutPage['mandate_eyebrow']) ?></span>
+          <p><?= e($facts[0]['value'] ?? '') ?></p>
         </div>
       </aside>
     </div>
@@ -86,10 +52,10 @@ $pathItems = [
   <section class="about-story">
     <div class="about-story-grid">
       <div class="about-story-heading">
-        <span class="mono reveal">Profile</span>
-        <h2 class="reveal d1"><?= e($profile['heading'] ?? 'About Shweta Nagpal') ?></h2>
-        <?php if (! empty($profile['lead_html'])): ?>
-          <p class="about-lead reveal d2"><?= $profile['lead_html'] ?></p>
+        <span class="mono reveal"><?= e($aboutPage['profile_eyebrow']) ?></span>
+        <h2 class="reveal d1"><?= e($aboutPage['profile_heading']) ?></h2>
+        <?php if (! empty($aboutPage['profile_lead_html'])): ?>
+          <p class="about-lead reveal d2"><?= $aboutPage['profile_lead_html'] ?></p>
         <?php endif; ?>
       </div>
       <div class="about-story-body">
@@ -111,7 +77,7 @@ $pathItems = [
 
   <section class="about-path">
     <div class="head">
-      <h2>Work & Mandate</h2>
+      <h2><?= e($aboutPage['path_heading']) ?></h2>
       <span class="rule reveal"></span>
     </div>
     <div class="about-path-grid">
@@ -127,10 +93,10 @@ $pathItems = [
 
   <section class="about-principles">
     <div class="about-principles-copy">
-      <span class="mono reveal">Operating Principles</span>
-      <h2 class="reveal d1">Governance discipline for public technology.</h2>
-      <?php if ($quotes !== []): ?>
-        <blockquote class="reveal d2"><?= e($quotes[0]) ?></blockquote>
+      <span class="mono reveal"><?= e($aboutPage['principles_eyebrow']) ?></span>
+      <h2 class="reveal d1"><?= e($aboutPage['principles_heading']) ?></h2>
+      <?php if (! empty($aboutPage['principles_quote'])): ?>
+        <blockquote class="reveal d2"><?= e($aboutPage['principles_quote']) ?></blockquote>
       <?php endif; ?>
     </div>
 
@@ -150,7 +116,7 @@ $pathItems = [
   <?php if ($expertiseItems !== []): ?>
     <section class="about-expertise">
       <div class="head">
-        <h2><?= e($expertise['heading'] ?? 'Expertise') ?></h2>
+        <h2><?= e($aboutPage['expertise_heading']) ?></h2>
         <span class="rule reveal"></span>
       </div>
       <div class="about-expertise-list">
@@ -167,7 +133,7 @@ $pathItems = [
 
   <section class="about-engagement" id="research">
     <div class="head">
-      <h2><?= e($research['heading'] ?? 'Research & Engagement') ?></h2>
+      <h2><?= e($aboutPage['research_heading']) ?></h2>
       <span class="rule reveal"></span>
     </div>
 
@@ -199,16 +165,16 @@ $pathItems = [
       </div>
     <?php endif; ?>
 
-    <?php if (! empty($research['note'])): ?>
-      <p class="res-note"><?= e($research['note']) ?></p>
+    <?php if (! empty($aboutPage['research_note'])): ?>
+      <p class="res-note"><?= e($aboutPage['research_note']) ?></p>
     <?php endif; ?>
   </section>
 
   <section class="about-closing">
     <div>
-      <span class="mono"><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></span>
-      <h2><?= e($schedule['heading'] ?? "Let's talk.") ?></h2>
-      <p><?= e($schedule['description'] ?? '') ?></p>
+      <span class="mono"><?= e($aboutPage['schedule_eyebrow']) ?></span>
+      <h2><?= e($aboutPage['schedule_heading']) ?></h2>
+      <p><?= e($aboutPage['schedule_description']) ?></p>
     </div>
     <div class="about-closing-actions">
       <button class="cta" type="button" data-schedule-open>Request a meeting slot</button>
