@@ -21,6 +21,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h16"/><path d="M17 10l3 2-3 2z"/></svg>
       <span>Header</span>
     </a>
+    <a class="nav-item<?= $active === 'cohorts' ? ' active' : '' ?>" href="<?= e(admin_cohorts_url()) ?>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="m10 9 5 3-5 3z"/><path d="M4 19l4-4h12"/></svg>
+      <span>Cohorts</span>
+    </a>
     <a class="nav-item<?= $active === 'schedule' ? ' active' : '' ?>" href="<?= e(admin_schedule_url()) ?>">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
       <span>Schedule</span>

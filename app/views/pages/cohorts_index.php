@@ -1,7 +1,7 @@
 <?php
 $identity = $site['identity'];
 $cohorts = $site['cohorts'] ?? [];
-$items = cohort_items(is_array($cohorts) ? $cohorts : []);
+$items = is_array($cohortItems ?? null) ? $cohortItems : cohort_items(is_array($cohorts) ? $cohorts : []);
 $featured = $items[0] ?? null;
 $schedule = $site['schedule'] ?? [];
 ?>
@@ -39,7 +39,7 @@ $schedule = $site['schedule'] ?? [];
     <div class="about-stat-row cohorts-stat-row reveal d4">
       <div class="about-stat">
         <span class="about-stat-value"><?= e((string) count($items)) ?></span>
-        <span class="about-stat-label">Static cohort entries</span>
+        <span class="about-stat-label">Published cohort entries</span>
       </div>
       <div class="about-stat">
         <span class="about-stat-value">Video</span>
@@ -51,7 +51,7 @@ $schedule = $site['schedule'] ?? [];
       </div>
       <div class="about-stat">
         <span class="about-stat-value">Admin</span>
-        <span class="about-stat-label">Prepared for future publishing workflow</span>
+        <span class="about-stat-label">Database-backed publishing workflow</span>
       </div>
     </div>
   </header>

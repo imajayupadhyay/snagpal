@@ -21,11 +21,8 @@ endif;
 
 $related = array_values(array_filter($items, static fn (array $item): bool => ($item['slug'] ?? '') !== ($cohort['slug'] ?? '')));
 $related = array_slice($related, 0, 3);
-$takeaways = [
-    'Policy guidance needs an operational model before it can become repeatable institutional practice.',
-    'Public-sector AI adoption depends on risk ownership, auditability, and clear decision rights.',
-    'Capability-building matters as much as procurement when technology affects public trust.',
-];
+$articleHtml = cohort_public_content_html($cohort['content'] ?? '', $cohort['description'] ?? '');
+$takeaways = cohort_public_takeaways($cohort);
 ?>
 <main class="cohorts-main">
   <header class="cohort-detail-hero" id="top">
@@ -84,20 +81,23 @@ $takeaways = [
     <article class="cohort-article-body">
       <span class="mono reveal">Field Notes</span>
       <h2 class="reveal d1">From recording to institutional practice.</h2>
-      <p class="reveal d2">This cohort is framed for public institutions that need to move from technology discussion to implementation discipline. The session connects policy language with the practical work of ownership, procurement, data stewardship, security, and accountability.</p>
-      <p class="reveal d3">The emphasis is not only on what technology can do, but on the conditions under which public systems should adopt it. That means treating risk, documentation, review, and public trust as part of the operating model from the beginning.</p>
-      <p class="reveal d4">Future admin publishing can replace these static notes with a full article body, uploaded media, author notes, and a publish status without changing the page structure.</p>
+      <div class="cohort-rich-body reveal d2"><?= $articleHtml ?></div>
+      <?php if (! empty($cohort['resource_url'])): ?>
+        <a class="about-text-link reveal d4" href="<?= e((string) $cohort['resource_url']) ?>" target="_blank" rel="noopener"><?= e($cohort['resource_label'] ?? 'Open resource') ?></a>
+      <?php endif; ?>
     </article>
 
-    <aside class="cohort-takeaways">
-      <span class="mono reveal">Takeaways</span>
-      <?php foreach ($takeaways as $index => $takeaway): ?>
-        <div class="cohort-takeaway reveal d<?= e((string) min($index + 1, 4)) ?>">
-          <span><?= e(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) ?></span>
-          <p><?= e($takeaway) ?></p>
-        </div>
-      <?php endforeach; ?>
-    </aside>
+    <?php if ($takeaways !== []): ?>
+      <aside class="cohort-takeaways">
+        <span class="mono reveal">Takeaways</span>
+        <?php foreach ($takeaways as $index => $takeaway): ?>
+          <div class="cohort-takeaway reveal d<?= e((string) min($index + 1, 4)) ?>">
+            <span><?= e(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) ?></span>
+            <p><?= e($takeaway) ?></p>
+          </div>
+        <?php endforeach; ?>
+      </aside>
+    <?php endif; ?>
   </section>
 
   <?php if ($related !== []): ?>

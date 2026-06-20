@@ -72,6 +72,13 @@ function admin_header_url(): string
     return url_path('sanchalak/header/');
 }
 
+function admin_cohorts_url(array $query = []): string
+{
+    $url = url_path('sanchalak/cohorts/');
+
+    return $query === [] ? $url : $url . '?' . http_build_query($query);
+}
+
 function admin_schedule_url(): string
 {
     return url_path('sanchalak/schedule/');

@@ -21,6 +21,7 @@ require APP_PATH . '/helpers.php';
 require APP_PATH . '/database.php';
 require APP_PATH . '/mailer.php';
 require APP_PATH . '/homepage.php';
+require APP_PATH . '/cohorts.php';
 require APP_PATH . '/scheduling.php';
 
 $site = homepage_content();

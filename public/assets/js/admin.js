@@ -48,8 +48,24 @@
 
     editor.querySelectorAll('[data-command]').forEach(function(button){
       button.addEventListener('click',function(){
+        var command=button.getAttribute('data-command');
+        var value=button.getAttribute('data-value')||null;
+
         surface.focus();
-        document.execCommand(button.getAttribute('data-command'),false,null);
+
+        if(command==='createLink'){
+          value=window.prompt('Enter the link URL','https://');
+
+          if(!value){
+            return;
+          }
+        }
+
+        if(command==='formatBlock'&&value){
+          value='<'+value+'>';
+        }
+
+        document.execCommand(command,false,value);
         sync();
       });
     });

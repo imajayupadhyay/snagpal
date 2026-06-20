@@ -75,6 +75,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   transition:background .2s,border-color .2s,color .2s}
 .ghost-btn:hover,.ghost-link:hover{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:none}
 .ghost-btn.small{height:34px;padding:0 13px;font-size:.8rem}
+.ghost-link.ghost-link-small{height:34px;padding:0 13px;font-size:.8rem}
 .ghost-btn.danger{color:var(--danger)}
 .ghost-btn.danger:hover{background:var(--danger);border-color:var(--danger);color:#fff}
 
@@ -268,9 +269,21 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .wysiwyg-toolbar button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
 .wysiwyg-surface{min-height:116px;padding:13px;line-height:1.65;outline:0}
 .wysiwyg-tall{min-height:240px}
-.wysiwyg-surface p{margin:0 0 1rem}
-.wysiwyg-surface p:last-child{margin-bottom:0}
+.wysiwyg-article-surface{min-height:340px}
+.wysiwyg-surface p,.wysiwyg-surface h2,.wysiwyg-surface h3,.wysiwyg-surface h4,
+.wysiwyg-surface ul,.wysiwyg-surface ol,.wysiwyg-surface blockquote{margin:0 0 1rem}
+.wysiwyg-surface p:last-child,.wysiwyg-surface h2:last-child,.wysiwyg-surface h3:last-child,
+.wysiwyg-surface ul:last-child,.wysiwyg-surface ol:last-child,.wysiwyg-surface blockquote:last-child{margin-bottom:0}
+.wysiwyg-surface h2,.wysiwyg-surface h3,.wysiwyg-surface h4{font-family:var(--cond);text-transform:uppercase;line-height:1.1}
+.wysiwyg-surface h2{font-size:1.55rem}
+.wysiwyg-surface h3{font-size:1.25rem}
+.wysiwyg-surface ul,.wysiwyg-surface ol{padding-left:1.4rem}
+.wysiwyg-surface li+li{margin-top:.35rem}
+.wysiwyg-surface blockquote{border-left:3px solid var(--accent);padding:.7rem .9rem;background:var(--accent-soft);
+  color:var(--accent-deep);border-radius:0 var(--radius-xs) var(--radius-xs) 0}
+.wysiwyg-surface a{color:var(--accent);font-weight:700}
 .wysiwyg-surface:focus{box-shadow:inset 0 0 0 2px rgba(12,94,85,.18)}
+.wysiwyg-toolbar-rich{flex-wrap:wrap}
 
 /* ---------- weekday tiles ---------- */
 .weekday-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -324,10 +337,20 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   background:rgba(108,116,112,.14);color:var(--muted);font-size:.7rem;font-weight:700;
   text-transform:uppercase;letter-spacing:.07em}
 .status-pill.open,.status-pill.confirmed{background:var(--accent-soft);color:var(--accent-deep)}
+.status-pill.published{background:var(--accent-soft);color:var(--accent-deep)}
+.status-pill.draft{background:rgba(108,116,112,.14);color:var(--muted)}
 .status-pill.closed,.status-pill.cancelled{background:var(--warn-soft);color:var(--warn)}
 .status-pill.booked{background:var(--info-soft);color:var(--info)}
 .status-pill.pending{background:#FBF0D9;color:#8A6A18}
 .status-pill.locked{background:var(--danger-soft);color:var(--danger)}
+
+/* ============================================================
+   COHORTS ADMIN
+   ============================================================ */
+.cohort-admin-table td:first-child{min-width:260px}
+.cohort-admin-table td:nth-child(2){white-space:nowrap}
+.cohort-featured-toggle{align-self:end;min-height:44px}
+.cohort-editor-form textarea[name="takeaways_text"]{min-height:140px}
 
 /* ============================================================
    SCHEDULE

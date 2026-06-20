@@ -22,6 +22,12 @@
         <p>Manage menu links for desktop and mobile navigation, including the header button text.</p>
         <span class="go">Manage header &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_cohorts_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="m10 9 5 3-5 3z"/><path d="M4 19l4-4h12"/></svg></span>
+        <h2>Cohorts</h2>
+        <p>Create and manage cohort posts with video, excerpts, article content, links, and publish status.</p>
+        <span class="go">Manage cohorts &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(admin_schedule_url()) ?>">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg></span>
         <h2>Schedule</h2>
