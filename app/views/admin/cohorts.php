@@ -1,6 +1,7 @@
 <?php
 $form = cohort_admin_normalize($form ?? cohort_admin_default());
 $isEditing = ! empty($form['id']);
+$pageContent = array_merge(cohorts_page_default_content(), is_array($pageContent ?? null) ? $pageContent : []);
 $takeawaysText = cohort_admin_takeaways_text($form);
 $formatDateTime = static function (?string $value): string {
     if (! $value) {
@@ -68,6 +69,79 @@ ob_start();
         <p>The primary cohort for the archive hero.</p>
       </article>
     </section>
+
+    <form class="content-form" method="post" action="<?= e(admin_cohorts_url()) ?>">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="save_page">
+
+      <section class="panel form-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Page Header</p>
+            <h2>Hero &amp; Page Content</h2>
+          </div>
+        </div>
+        <p class="hint">The section heading and intro paragraph above the cohort list are managed from the Homepage editor's "Cohorts" panel. Use the fields below for the rest of this page's hero.</p>
+        <div class="form-grid">
+          <div class="field">
+            <label for="page_kicker">Kicker label</label>
+            <input id="page_kicker" name="kicker" value="<?= e($pageContent['kicker']) ?>" maxlength="120">
+          </div>
+          <div class="field">
+            <label for="page_heading_line1">Heading word 1</label>
+            <input id="page_heading_line1" name="heading_line1" value="<?= e($pageContent['heading_line1']) ?>" maxlength="60">
+          </div>
+          <div class="field">
+            <label for="page_heading_line2">Heading word 2</label>
+            <input id="page_heading_line2" name="heading_line2" value="<?= e($pageContent['heading_line2']) ?>" maxlength="60">
+            <p class="hint">Displayed as two stacked lines, e.g. "Cohort" / "Library".</p>
+          </div>
+          <div class="field">
+            <label for="page_browse_cta_label">Browse link label</label>
+            <input id="page_browse_cta_label" name="browse_cta_label" value="<?= e($pageContent['browse_cta_label']) ?>" maxlength="80">
+          </div>
+        </div>
+      </section>
+
+      <section class="panel form-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Stat Row</p>
+            <h2>Hero Stat Tiles</h2>
+          </div>
+        </div>
+        <p class="hint">The first tile always shows the live published cohort count. These three are editable text.</p>
+        <div class="form-grid">
+          <div class="field">
+            <label for="page_stat2_value">Stat 2 value</label>
+            <input id="page_stat2_value" name="stat2_value" value="<?= e($pageContent['stat2_value']) ?>" maxlength="40">
+          </div>
+          <div class="field">
+            <label for="page_stat2_label">Stat 2 label</label>
+            <input id="page_stat2_label" name="stat2_label" value="<?= e($pageContent['stat2_label']) ?>" maxlength="120">
+          </div>
+          <div class="field">
+            <label for="page_stat3_value">Stat 3 value</label>
+            <input id="page_stat3_value" name="stat3_value" value="<?= e($pageContent['stat3_value']) ?>" maxlength="40">
+          </div>
+          <div class="field">
+            <label for="page_stat3_label">Stat 3 label</label>
+            <input id="page_stat3_label" name="stat3_label" value="<?= e($pageContent['stat3_label']) ?>" maxlength="120">
+          </div>
+          <div class="field">
+            <label for="page_stat4_value">Stat 4 value</label>
+            <input id="page_stat4_value" name="stat4_value" value="<?= e($pageContent['stat4_value']) ?>" maxlength="40">
+          </div>
+          <div class="field">
+            <label for="page_stat4_label">Stat 4 label</label>
+            <input id="page_stat4_label" name="stat4_label" value="<?= e($pageContent['stat4_label']) ?>" maxlength="120">
+          </div>
+        </div>
+        <div class="sticky-actions">
+          <button type="submit">Save Page Header</button>
+        </div>
+      </section>
+    </form>
 
     <section class="panel">
       <div class="panel-head">

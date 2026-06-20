@@ -12,6 +12,7 @@ $admin = require_admin();
 $errors = [];
 $editing = null;
 $form = cohort_admin_default();
+$pageContent = cohorts_page_content();
 
 try {
     $editId = (int) ($_GET['edit'] ?? 0);
@@ -24,7 +25,12 @@ try {
         } else {
             $action = (string) ($_POST['action'] ?? '');
 
-            if ($action === 'save_cohort') {
+            if ($action === 'save_page') {
+                $pageContent = cohorts_page_content_from_post($_POST);
+                cohorts_page_save_content($pageContent, (int) $admin['id']);
+                flash('success', 'Page header updated.');
+                redirect(admin_cohorts_url());
+            } elseif ($action === 'save_cohort') {
                 $id = (int) ($_POST['cohort_id'] ?? 0);
                 $current = $id > 0 ? cohort_admin_find($id) : null;
 
@@ -73,6 +79,7 @@ render('admin/cohorts', [
     'overview' => $overview,
     'form' => $form,
     'editing' => $editing,
+    'pageContent' => $pageContent,
     'errors' => $errors,
     'success' => flash('success'),
     'pageTitle' => 'Cohorts',

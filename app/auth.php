@@ -79,6 +79,13 @@ function admin_cohorts_url(array $query = []): string
     return $query === [] ? $url : $url . '?' . http_build_query($query);
 }
 
+function admin_events_url(array $query = []): string
+{
+    $url = url_path('sanchalak/events/');
+
+    return $query === [] ? $url : $url . '?' . http_build_query($query);
+}
+
 function admin_schedule_url(): string
 {
     return url_path('sanchalak/schedule/');

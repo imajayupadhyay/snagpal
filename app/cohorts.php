@@ -626,3 +626,78 @@ function cohort_seed_takeaways(): array
         'Capability-building matters as much as procurement when technology affects public trust.',
     ];
 }
+
+function cohorts_page_default_content(): array
+{
+    return [
+        'kicker' => 'Cohorts · Video Notes',
+        'heading_line1' => 'Cohort',
+        'heading_line2' => 'Library',
+        'browse_cta_label' => 'Browse Cohorts',
+        'stat2_value' => 'Video',
+        'stat2_label' => 'Recording-led learning format',
+        'stat3_value' => 'AI',
+        'stat3_label' => 'Governance and public technology',
+        'stat4_value' => 'Admin',
+        'stat4_label' => 'Database-backed publishing workflow',
+    ];
+}
+
+function cohorts_page_content(): array
+{
+    $default = cohorts_page_default_content();
+
+    try {
+        $statement = db()->prepare('SELECT content_json FROM site_contents WHERE content_key = :key LIMIT 1');
+        $statement->execute(['key' => 'cohorts_page']);
+        $row = $statement->fetch();
+
+        if (! $row) {
+            return $default;
+        }
+
+        $stored = json_decode((string) $row['content_json'], true, 512, JSON_THROW_ON_ERROR);
+
+        return is_array($stored) ? array_merge($default, $stored) : $default;
+    } catch (Throwable) {
+        return $default;
+    }
+}
+
+function cohorts_page_content_from_post(array $post): array
+{
+    $default = cohorts_page_default_content();
+
+    return [
+        'kicker' => homepage_text($post['kicker'] ?? $default['kicker']),
+        'heading_line1' => homepage_text($post['heading_line1'] ?? $default['heading_line1']),
+        'heading_line2' => homepage_text($post['heading_line2'] ?? $default['heading_line2']),
+        'browse_cta_label' => homepage_text($post['browse_cta_label'] ?? $default['browse_cta_label']),
+        'stat2_value' => homepage_text($post['stat2_value'] ?? $default['stat2_value']),
+        'stat2_label' => homepage_text($post['stat2_label'] ?? $default['stat2_label']),
+        'stat3_value' => homepage_text($post['stat3_value'] ?? $default['stat3_value']),
+        'stat3_label' => homepage_text($post['stat3_label'] ?? $default['stat3_label']),
+        'stat4_value' => homepage_text($post['stat4_value'] ?? $default['stat4_value']),
+        'stat4_label' => homepage_text($post['stat4_label'] ?? $default['stat4_label']),
+    ];
+}
+
+function cohorts_page_save_content(array $content, ?int $adminId = null): void
+{
+    $json = json_encode($content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+
+    $statement = db()->prepare(
+        'INSERT INTO site_contents (content_key, content_json, updated_by)
+         VALUES (:content_key, :content_json, :updated_by)
+         ON DUPLICATE KEY UPDATE
+             content_json = VALUES(content_json),
+             updated_by = VALUES(updated_by),
+             updated_at = CURRENT_TIMESTAMP'
+    );
+
+    $statement->execute([
+        'content_key' => 'cohorts_page',
+        'content_json' => $json,
+        'updated_by' => $adminId,
+    ]);
+}

@@ -587,6 +587,9 @@
   .event-card h3{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.2rem,2.3vw,1.75rem);
     line-height:1.06}
   .event-card p{margin-top:auto;color:var(--muted);font-size:0.98rem;line-height:1.64;font-weight:300}
+  .event-card-detail{margin-top:-0.4rem;font-family:var(--mono);font-size:0.68rem;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--muted)}
+  .event-card-cta{margin-top:0.3rem}
   .events-note{margin-top:clamp(1.6rem,3vw,2.2rem);font-family:var(--mono);font-size:0.66rem;letter-spacing:0.06em;
     text-transform:uppercase;color:var(--muted);line-height:1.6}
 

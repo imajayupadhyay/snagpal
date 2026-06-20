@@ -1,22 +1,22 @@
 <?php
 $identity = $site['identity'];
 $events = $site['events'] ?? [];
-$items = array_values(array_filter($events['items'] ?? [], 'is_array'));
-$upcoming = array_values(array_filter($items, static fn (array $item): bool => strtolower((string) ($item['status'] ?? '')) === 'upcoming'));
-$past = array_values(array_filter($items, static fn (array $item): bool => strtolower((string) ($item['status'] ?? '')) !== 'upcoming'));
+$upcoming = array_values(array_filter($events['upcoming'] ?? [], 'is_array'));
+$past = array_values(array_filter($events['past'] ?? [], 'is_array'));
 $schedule = $site['schedule'] ?? [];
+$pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : events_page_default_content();
 ?>
 <main class="events-main">
   <header class="about-hero events-hero" id="top">
     <div class="about-hero-grid">
       <div class="about-hero-copy">
-        <div class="mono kick reveal">Upcoming <span class="ac">&middot;</span> Past Events</div>
+        <div class="mono kick reveal"><?= e($pageContent['kicker']) ?></div>
         <h1>
-          <span class="clip"><span>Events</span></span>
-          <span class="clip"><span class="a">Calendar</span></span>
+          <span class="clip"><span><?= e($pageContent['heading_line1']) ?></span></span>
+          <span class="clip"><span class="a"><?= e($pageContent['heading_line2']) ?></span></span>
         </h1>
         <p class="about-role reveal d2"><?= e($site['hero']['role'] ?? '') ?></p>
-        <p class="about-lede reveal d3"><?= e($events['intro'] ?? 'Talks, workshops, and public-sector technology engagements.') ?></p>
+        <p class="about-lede reveal d3"><?= e($pageContent['intro']) ?></p>
         <div class="about-actions reveal d4">
           <a class="about-text-link" href="#upcoming-events">Upcoming</a>
           <a class="about-text-link" href="#past-events">Past Events</a>
@@ -24,9 +24,9 @@ $schedule = $site['schedule'] ?? [];
       </div>
 
       <aside class="events-summary-panel reveal d2">
-        <span class="mono">Event Library</span>
-        <strong>Video-led event cards</strong>
-        <p>Each container can use a YouTube/Vimeo link or an uploaded video file, with event text placed below the media.</p>
+        <span class="mono"><?= e($pageContent['panel_eyebrow']) ?></span>
+        <strong><?= e($pageContent['panel_title']) ?></strong>
+        <p><?= e($pageContent['panel_description']) ?></p>
         <div class="events-summary-stats">
           <div><b><?= e((string) count($upcoming)) ?></b><span>Upcoming</span></div>
           <div><b><?= e((string) count($past)) ?></b><span>Past</span></div>
@@ -52,11 +52,17 @@ $schedule = $site['schedule'] ?? [];
             <?php endif; ?>
             <div class="event-card-body">
               <div class="event-card-meta">
-                <span><?= e($item['status'] ?? 'Upcoming') ?></span>
+                <span>Upcoming</span>
                 <em><?= e($item['meta'] ?? '') ?></em>
               </div>
               <h3><?= e($item['title'] ?? '') ?></h3>
               <p><?= e($item['description'] ?? '') ?></p>
+              <?php if (! empty($item['location'])): ?>
+                <div class="event-card-detail"><?= e($item['location']) ?></div>
+              <?php endif; ?>
+              <?php if (! empty($item['registration_url'])): ?>
+                <a class="about-text-link event-card-cta" href="<?= e($item['registration_url']) ?>" target="_blank" rel="noopener"><?= e($item['registration_label'] ?: 'Register') ?></a>
+              <?php endif; ?>
             </div>
           </article>
         <?php endforeach; ?>
@@ -81,19 +87,25 @@ $schedule = $site['schedule'] ?? [];
             <?php endif; ?>
             <div class="event-card-body">
               <div class="event-card-meta">
-                <span><?= e($item['status'] ?? 'Past') ?></span>
+                <span>Past</span>
                 <em><?= e($item['meta'] ?? '') ?></em>
               </div>
               <h3><?= e($item['title'] ?? '') ?></h3>
               <p><?= e($item['description'] ?? '') ?></p>
+              <?php if (! empty($item['location'])): ?>
+                <div class="event-card-detail"><?= e($item['location']) ?></div>
+              <?php endif; ?>
+              <?php if (! empty($item['registration_url'])): ?>
+                <a class="about-text-link event-card-cta" href="<?= e($item['registration_url']) ?>" target="_blank" rel="noopener"><?= e($item['registration_label'] ?: 'View link') ?></a>
+              <?php endif; ?>
             </div>
           </article>
         <?php endforeach; ?>
       </div>
     <?php endif; ?>
 
-    <?php if (! empty($events['note'])): ?>
-      <p class="events-note"><?= e($events['note']) ?></p>
+    <?php if (! empty($pageContent['note'])): ?>
+      <p class="events-note"><?= e($pageContent['note']) ?></p>
     <?php endif; ?>
   </section>
 

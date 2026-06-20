@@ -4,20 +4,21 @@ $cohorts = $site['cohorts'] ?? [];
 $items = is_array($cohortItems ?? null) ? $cohortItems : cohort_items(is_array($cohorts) ? $cohorts : []);
 $featured = $items[0] ?? null;
 $schedule = $site['schedule'] ?? [];
+$pageContent = is_array($site['cohorts_page'] ?? null) ? $site['cohorts_page'] : cohorts_page_default_content();
 ?>
 <main class="cohorts-main">
   <header class="about-hero cohorts-archive-hero" id="top">
     <div class="about-hero-grid">
       <div class="about-hero-copy">
-        <div class="mono kick reveal">Cohorts <span class="ac">&middot;</span> Video Notes</div>
+        <div class="mono kick reveal"><?= e($pageContent['kicker']) ?></div>
         <h1>
-          <span class="clip"><span>Cohort</span></span>
-          <span class="clip"><span class="a">Library</span></span>
+          <span class="clip"><span><?= e($pageContent['heading_line1']) ?></span></span>
+          <span class="clip"><span class="a"><?= e($pageContent['heading_line2']) ?></span></span>
         </h1>
         <p class="about-role reveal d2"><?= e($site['hero']['role'] ?? '') ?></p>
         <p class="about-lede reveal d3"><?= e($cohorts['intro'] ?? 'Recordings and field notes from recent capability-building cohorts on AI governance and public-sector technology.') ?></p>
         <div class="about-actions reveal d4">
-          <a class="about-text-link" href="#cohort-list">Browse Cohorts</a>
+          <a class="about-text-link" href="#cohort-list"><?= e($pageContent['browse_cta_label']) ?></a>
         </div>
       </div>
 
@@ -42,16 +43,16 @@ $schedule = $site['schedule'] ?? [];
         <span class="about-stat-label">Published cohort entries</span>
       </div>
       <div class="about-stat">
-        <span class="about-stat-value">Video</span>
-        <span class="about-stat-label">Recording-led learning format</span>
+        <span class="about-stat-value"><?= e($pageContent['stat2_value']) ?></span>
+        <span class="about-stat-label"><?= e($pageContent['stat2_label']) ?></span>
       </div>
       <div class="about-stat">
-        <span class="about-stat-value">AI</span>
-        <span class="about-stat-label">Governance and public technology</span>
+        <span class="about-stat-value"><?= e($pageContent['stat3_value']) ?></span>
+        <span class="about-stat-label"><?= e($pageContent['stat3_label']) ?></span>
       </div>
       <div class="about-stat">
-        <span class="about-stat-value">Admin</span>
-        <span class="about-stat-label">Database-backed publishing workflow</span>
+        <span class="about-stat-value"><?= e($pageContent['stat4_value']) ?></span>
+        <span class="about-stat-label"><?= e($pageContent['stat4_label']) ?></span>
       </div>
     </div>
   </header>
