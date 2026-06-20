@@ -29,6 +29,7 @@ return [
         ['label' => 'Events', 'href' => '/events/', 'class' => 'nav-events'],
         ['label' => 'Schedule a Meet', 'href' => '#schedule', 'class' => 'cta'],
     ],
+    'header_navigation_managed' => false,
     'hero' => [
         'kicker' => 'AI Governance',
         'kicker_suffix' => 'Public-Sector Technology',

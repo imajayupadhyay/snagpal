@@ -67,6 +67,11 @@ function admin_homepage_url(): string
     return url_path('sanchalak/homepage/');
 }
 
+function admin_header_url(): string
+{
+    return url_path('sanchalak/header/');
+}
+
 function admin_schedule_url(): string
 {
     return url_path('sanchalak/schedule/');

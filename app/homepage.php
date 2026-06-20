@@ -97,6 +97,13 @@ function homepage_merge_content(array $default, array $stored): array
 
 function homepage_content_from_post(array $post, array $current): array
 {
+    $navigation = isset($post['navigation']) && is_array($post['navigation'])
+        ? homepage_rows_from_columns($post['navigation'], ['label', 'href', 'class'], ['label', 'href'])
+        : ($current['navigation'] ?? homepage_default_content()['navigation']);
+    $headerNavigationManaged = isset($post['navigation'])
+        ? true
+        : (bool) ($current['header_navigation_managed'] ?? false);
+
     return [
         'page' => [
             'lang' => homepage_text($post['page']['lang'] ?? 'en'),
@@ -117,7 +124,8 @@ function homepage_content_from_post(array $post, array $current): array
                 'url' => homepage_text($post['identity']['linkedin']['url'] ?? ''),
             ],
         ],
-        'navigation' => homepage_rows_from_columns($post['navigation'] ?? [], ['label', 'href', 'class'], ['label', 'href']),
+        'navigation' => $navigation,
+        'header_navigation_managed' => $headerNavigationManaged,
         'hero' => [
             'kicker' => homepage_text($post['hero']['kicker'] ?? ''),
             'kicker_suffix' => homepage_text($post['hero']['kicker_suffix'] ?? ''),
@@ -234,4 +242,118 @@ function homepage_paragraphs(mixed $value): array
     $parts = preg_split('/\R\s*\R/', homepage_textarea($value)) ?: [];
 
     return array_values(array_filter(array_map('homepage_rich_text', $parts), static fn (string $paragraph): bool => $paragraph !== ''));
+}
+
+function header_navigation_from_post(array $post, array &$errors): array
+{
+    $items = [];
+    $validItemCount = 0;
+    $rows = $post['menu_items'] ?? [];
+
+    if (! is_array($rows)) {
+        $rows = [];
+    }
+
+    foreach ($rows as $index => $row) {
+        if (! is_array($row)) {
+            continue;
+        }
+
+        $rowNumber = is_int($index) ? $index + 1 : count($items) + 1;
+        $label = homepage_text($row['label'] ?? '');
+        $href = homepage_text($row['href'] ?? '');
+        $class = homepage_css_classes($row['class'] ?? '');
+        $hasAnyValue = $label !== '' || $href !== '' || $class !== '';
+
+        if (! $hasAnyValue) {
+            continue;
+        }
+
+        $item = [
+            'label' => $label,
+            'href' => $href,
+            'class' => $class,
+        ];
+
+        if (! empty($row['external'])) {
+            $item['external'] = true;
+        }
+
+        if ($label === '' || $href === '') {
+            $errors[] = 'Menu item ' . $rowNumber . ' needs both a label and a link.';
+            $items[] = $item;
+            continue;
+        }
+
+        if (! header_link_is_allowed($href)) {
+            $errors[] = 'Menu item ' . $rowNumber . ' has an unsupported link. Use /path, #section, http(s), mailto, or tel links.';
+            $items[] = $item;
+            continue;
+        }
+
+        if (site_is_hidden_navigation_item($item)) {
+            $errors[] = 'Menu item ' . $rowNumber . ' points to a retired homepage section and was not saved.';
+            $items[] = $item;
+            continue;
+        }
+
+        $item['class'] = site_navigation_item_classes($item);
+        $items[] = $item;
+        $validItemCount++;
+    }
+
+    if ($validItemCount === 0) {
+        $errors[] = 'Add at least one menu item.';
+    }
+
+    $ctaPost = is_array($post['header_cta'] ?? null) ? $post['header_cta'] : [];
+    $ctaLabel = homepage_text($ctaPost['label'] ?? '');
+    $ctaHref = homepage_text($ctaPost['href'] ?? '');
+    $ctaClass = site_navigation_cta_classes(homepage_css_classes($ctaPost['class'] ?? 'cta'));
+
+    if ($ctaLabel === '') {
+        $errors[] = 'Add button text for the header action.';
+    }
+
+    if ($ctaHref === '') {
+        $errors[] = 'Add a link or #schedule action for the header button.';
+    } elseif (! header_link_is_allowed($ctaHref)) {
+        $errors[] = 'The header button link is unsupported. Use /path, #section, http(s), mailto, or tel links.';
+    }
+
+    $cta = [
+        'label' => $ctaLabel !== '' ? $ctaLabel : site_default_header_cta()['label'],
+        'href' => $ctaHref !== '' ? $ctaHref : site_default_header_cta()['href'],
+        'class' => $ctaClass,
+    ];
+
+    if (! empty($ctaPost['external'])) {
+        $cta['external'] = true;
+    }
+
+    return array_merge($items, [$cta]);
+}
+
+function header_link_is_allowed(string $href): bool
+{
+    if ($href === '' || strlen($href) > 500) {
+        return false;
+    }
+
+    return str_starts_with($href, '#')
+        || str_starts_with($href, '/')
+        || preg_match('#^https?://#i', $href) === 1
+        || preg_match('#^mailto:#i', $href) === 1
+        || preg_match('#^tel:#i', $href) === 1;
+}
+
+function homepage_css_classes(mixed $value): string
+{
+    $raw = homepage_text($value);
+    $classes = preg_split('/\s+/', $raw) ?: [];
+    $classes = array_values(array_filter($classes, static function (string $class): bool {
+        return preg_match('/^[A-Za-z_-][A-Za-z0-9_-]*$/', $class) === 1;
+    }));
+
+    return implode(' ', array_unique($classes));
 }

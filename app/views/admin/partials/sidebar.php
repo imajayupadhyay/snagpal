@@ -17,6 +17,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
       <span>Homepage</span>
     </a>
+    <a class="nav-item<?= $active === 'header' ? ' active' : '' ?>" href="<?= e(admin_header_url()) ?>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h16"/><path d="M17 10l3 2-3 2z"/></svg>
+      <span>Header</span>
+    </a>
     <a class="nav-item<?= $active === 'schedule' ? ' active' : '' ?>" href="<?= e(admin_schedule_url()) ?>">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
       <span>Schedule</span>

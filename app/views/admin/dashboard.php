@@ -16,6 +16,12 @@
         <p>Edit every section of the public site: hero, profile, expertise, cohorts, and more.</p>
         <span class="go">Manage content &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_header_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h16"/><path d="M17 10l3 2-3 2z"/></svg></span>
+        <h2>Header</h2>
+        <p>Manage menu links for desktop and mobile navigation, including the header button text.</p>
+        <span class="go">Manage header &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(admin_schedule_url()) ?>">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg></span>
         <h2>Schedule</h2>

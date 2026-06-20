@@ -79,6 +79,239 @@ function external_link_attrs(array $item): string
     return ' target="_blank" rel="noopener"';
 }
 
+function site_default_navigation_links(): array
+{
+    return [
+        'about' => ['label' => 'About Shweta', 'href' => url_path('about-shweta/'), 'class' => 'nav-about'],
+        'awards' => ['label' => 'Awards & Recognitions', 'href' => url_path('awards-and-recognitions/'), 'class' => 'nav-awards'],
+        'cohorts' => ['label' => 'Cohorts', 'href' => url_path('cohorts/'), 'class' => 'nav-cohorts'],
+        'events' => ['label' => 'Events', 'href' => url_path('events/'), 'class' => 'nav-events'],
+    ];
+}
+
+function site_default_header_cta(): array
+{
+    return ['label' => 'Schedule a Meet', 'href' => '#schedule', 'class' => 'cta'];
+}
+
+function site_is_hidden_navigation_item(array $item): bool
+{
+    $label = strtolower(trim((string) ($item['label'] ?? '')));
+    $href = strtolower(trim((string) ($item['href'] ?? '')));
+
+    return in_array($label, ['expertise', 'focus areas', 'research'], true)
+        || in_array($href, ['#expertise', '#focus', '#research'], true);
+}
+
+function site_navigation_key(array $item): ?string
+{
+    $label = strtolower(trim(str_replace('&', 'and', (string) ($item['label'] ?? ''))));
+    $href = strtolower(trim((string) ($item['href'] ?? '')));
+
+    if ($label === 'about shweta' || str_contains($href, 'about-shweta')) {
+        return 'about';
+    }
+
+    if ($label === 'awards and recognitions' || str_contains($href, 'awards-and-recognitions')) {
+        return 'awards';
+    }
+
+    if ($label === 'cohorts' || preg_match('~(^|/)cohorts(/|$)~', $href) === 1) {
+        return 'cohorts';
+    }
+
+    if ($label === 'events' || preg_match('~(^|/)events(/|$)~', $href) === 1) {
+        return 'events';
+    }
+
+    return null;
+}
+
+function site_navigation_item_classes(array $item): string
+{
+    $class = trim((string) ($item['class'] ?? ''));
+    $key = site_navigation_key($item);
+    $classByKey = [
+        'about' => 'nav-about',
+        'awards' => 'nav-awards',
+        'cohorts' => 'nav-cohorts',
+        'events' => 'nav-events',
+    ];
+
+    if ($key !== null && isset($classByKey[$key]) && ! in_array($classByKey[$key], preg_split('/\s+/', $class) ?: [], true)) {
+        $class = trim($class . ' ' . $classByKey[$key]);
+    }
+
+    return $class;
+}
+
+function site_navigation_is_cta(array $item): bool
+{
+    $classes = preg_split('/\s+/', strtolower(trim((string) ($item['class'] ?? '')))) ?: [];
+
+    return in_array('cta', $classes, true);
+}
+
+function site_navigation_is_schedule_cta(array $item): bool
+{
+    $label = (string) ($item['label'] ?? '');
+    $href = (string) ($item['href'] ?? '');
+
+    return site_navigation_is_cta($item)
+        && ($href === '#schedule' || stripos($label, 'schedule') !== false);
+}
+
+function site_navigation_is_current(array $item, string $currentPage): bool
+{
+    $key = site_navigation_key($item);
+
+    return ($currentPage === 'about' && $key === 'about')
+        || ($currentPage === 'awards' && $key === 'awards')
+        || ($currentPage === 'cohorts' && $key === 'cohorts')
+        || ($currentPage === 'events' && $key === 'events');
+}
+
+function site_navigation_display_href(string $href, string $currentPage): string
+{
+    return $currentPage !== 'home' && str_starts_with($href, '#') ? url_path($href) : $href;
+}
+
+function site_navigation_regular_items(array $navigation): array
+{
+    return array_values(array_filter($navigation, static fn (array $item): bool => ! site_navigation_is_cta($item)));
+}
+
+function site_navigation_cta_item(array $navigation): array
+{
+    foreach ($navigation as $item) {
+        if (is_array($item) && site_navigation_is_cta($item)) {
+            return $item;
+        }
+    }
+
+    return site_default_header_cta();
+}
+
+function site_navigation(array $navigation, bool $ensureDefaults = true, bool $ensureCta = true): array
+{
+    $items = [];
+    $cta = null;
+
+    foreach ($navigation as $item) {
+        if (! is_array($item)) {
+            continue;
+        }
+
+        $label = trim((string) ($item['label'] ?? ''));
+        $href = trim((string) ($item['href'] ?? ''));
+
+        if ($label === '' || $href === '') {
+            continue;
+        }
+
+        $clean = [
+            'label' => $label,
+            'href' => $href,
+            'class' => site_navigation_item_classes($item),
+        ];
+
+        if (! empty($item['external'])) {
+            $clean['external'] = true;
+        }
+
+        if (site_is_hidden_navigation_item($clean)) {
+            continue;
+        }
+
+        if (site_navigation_is_cta($clean)) {
+            $cta ??= $clean;
+            continue;
+        }
+
+        $items[] = $clean;
+    }
+
+    if ($ensureDefaults) {
+        $items = site_navigation_with_defaults($items);
+    }
+
+    if ($ensureCta) {
+        $cta ??= site_default_header_cta();
+    }
+
+    if ($cta !== null) {
+        $cta['class'] = site_navigation_cta_classes((string) ($cta['class'] ?? 'cta'));
+        $items[] = $cta;
+    }
+
+    return $items;
+}
+
+function site_navigation_with_defaults(array $items): array
+{
+    $defaults = site_default_navigation_links();
+
+    foreach ($defaults as $key => $default) {
+        $present = false;
+
+        foreach ($items as $item) {
+            if (site_navigation_key($item) === $key) {
+                $present = true;
+                break;
+            }
+        }
+
+        if ($present) {
+            continue;
+        }
+
+        $insertAt = site_navigation_default_insert_index($items, $key);
+        array_splice($items, $insertAt, 0, [$default]);
+    }
+
+    return $items;
+}
+
+function site_navigation_default_insert_index(array $items, string $key): int
+{
+    if ($key === 'about') {
+        return 0;
+    }
+
+    $afterKeys = [
+        'awards' => ['about'],
+        'cohorts' => ['awards', 'about'],
+        'events' => ['cohorts', 'awards', 'about'],
+    ];
+    $preferred = $afterKeys[$key] ?? [];
+    $insertAt = 0;
+
+    foreach ($items as $index => $item) {
+        $itemKey = site_navigation_key($item);
+
+        if ($itemKey !== null && in_array($itemKey, $preferred, true)) {
+            $insertAt = $index + 1;
+
+            if ($itemKey === $preferred[0]) {
+                break;
+            }
+        }
+    }
+
+    return $insertAt;
+}
+
+function site_navigation_cta_classes(string $class): string
+{
+    $classes = preg_split('/\s+/', strtolower(trim($class))) ?: [];
+
+    if (! in_array('cta', $classes, true)) {
+        $class = trim($class . ' cta');
+    }
+
+    return $class !== '' ? $class : 'cta';
+}
+
 function cohort_slug(string $value): string
 {
     $slug = strtolower(trim($value));

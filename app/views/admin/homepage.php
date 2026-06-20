@@ -8,6 +8,11 @@ $rows = static function (array $items, int $blankRows = 1): array {
 };
 $lines = static fn (array $items): string => implode("\n", $items);
 $paragraphs = static fn (array $items): string => implode("\n\n", $items);
+$headerNavigationPreview = site_navigation(
+    $content['navigation'] ?? [],
+    empty($content['header_navigation_managed']),
+    true
+);
 $editorParagraphs = static function (array $items): string {
     $html = '';
 
@@ -96,17 +101,20 @@ ob_start();
       </section>
 
       <section class="panel form-panel">
-        <div class="panel-head"><div><p class="eyebrow">Navigation</p><h2>Menu Links</h2></div></div>
-        <div class="repeat-list">
-          <?php foreach ($rows($content['navigation'] ?? [], 2) as $item): ?>
-            <div class="repeat-row nav-row">
-              <input name="navigation[label][]" placeholder="Label" value="<?= e($item['label'] ?? '') ?>">
-              <input name="navigation[href][]" placeholder="#section" value="<?= e($item['href'] ?? '') ?>">
-              <input name="navigation[class][]" placeholder="CSS class" value="<?= e($item['class'] ?? '') ?>">
-            </div>
+        <div class="panel-head">
+          <div><p class="eyebrow">Navigation</p><h2>Header Menu</h2></div>
+          <a class="ghost-link" href="<?= e(admin_header_url()) ?>">Manage Header</a>
+        </div>
+        <div class="header-preview-strip header-preview-strip-inline" aria-label="Header menu preview">
+          <?php foreach ($headerNavigationPreview as $item): ?>
+            <?php if (site_navigation_is_cta($item)): ?>
+              <span class="header-preview-button"><?= e($item['label'] ?? '') ?></span>
+            <?php else: ?>
+              <span class="header-preview-link"><?= e($item['label'] ?? '') ?></span>
+            <?php endif; ?>
           <?php endforeach; ?>
         </div>
-        <p class="hint">Clear a row and save to remove it. Empty rows are ignored.</p>
+        <p class="hint panel-hint">The desktop menu, mobile menu, and header button are managed from the dedicated Header page.</p>
       </section>
 
       <section class="panel form-panel">

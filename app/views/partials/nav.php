@@ -1,118 +1,30 @@
 <?php
 $currentPage = (string) ($currentPage ?? 'home');
-$navigation = array_values($site['navigation'] ?? []);
-$hiddenNavigationLabels = ['expertise', 'focus areas', 'research'];
-$hiddenNavigationHrefs = ['#expertise', '#focus', '#research'];
-$navigation = array_values(array_filter($navigation, static function (array $item) use ($hiddenNavigationLabels, $hiddenNavigationHrefs): bool {
-    $label = strtolower(trim((string) ($item['label'] ?? '')));
-    $href = strtolower(trim((string) ($item['href'] ?? '')));
-
-    return ! in_array($label, $hiddenNavigationLabels, true)
-        && ! in_array($href, $hiddenNavigationHrefs, true);
-}));
-$hasAboutLink = false;
-$hasAwardsLink = false;
-$hasCohortsLink = false;
-$hasEventsLink = false;
-
-foreach ($navigation as $item) {
-    $label = strtolower((string) ($item['label'] ?? ''));
-    $href = strtolower((string) ($item['href'] ?? ''));
-
-    if ($label === 'about shweta' || str_contains($href, 'about-shweta')) {
-        $hasAboutLink = true;
-    }
-
-    if ($label === 'awards and recognitions' || str_contains($href, 'awards-and-recognitions')) {
-        $hasAwardsLink = true;
-    }
-
-    if ($label === 'cohorts' || str_contains($href, 'cohorts')) {
-        $hasCohortsLink = true;
-    }
-
-    if ($label === 'events' || str_contains($href, 'events')) {
-        $hasEventsLink = true;
-    }
-}
-
-if (! $hasAboutLink) {
-    array_unshift($navigation, [
-        'label' => 'About Shweta',
-        'href' => url_path('about-shweta/'),
-        'class' => 'nav-about',
-    ]);
-}
-
-if (! $hasAwardsLink) {
-    $awardsLink = [
-        'label' => 'Awards & Recognitions',
-        'href' => url_path('awards-and-recognitions/'),
-        'class' => 'nav-awards',
-    ];
-    $insertAt = 0;
-
-    foreach ($navigation as $index => $item) {
-        $href = strtolower((string) ($item['href'] ?? ''));
-
-        if (str_contains($href, 'about-shweta')) {
-            $insertAt = $index + 1;
-            break;
-        }
-    }
-
-    array_splice($navigation, $insertAt, 0, [$awardsLink]);
-}
-
-if (! $hasCohortsLink) {
-    $cohortsLink = [
-        'label' => 'Cohorts',
-        'href' => url_path('cohorts/'),
-        'class' => 'nav-cohorts',
-    ];
-    $insertAt = 0;
-
-    foreach ($navigation as $index => $item) {
-        $href = strtolower((string) ($item['href'] ?? ''));
-
-        if (str_contains($href, 'awards-and-recognitions')) {
-            $insertAt = $index + 1;
-            break;
-        }
-
-        if (str_contains($href, 'about-shweta')) {
-            $insertAt = $index + 1;
-        }
-    }
-
-    array_splice($navigation, $insertAt, 0, [$cohortsLink]);
-}
-
-if (! $hasEventsLink) {
-    $eventsLink = [
-        'label' => 'Events',
-        'href' => url_path('events/'),
-        'class' => 'nav-events',
-    ];
-    $insertAt = 0;
-
-    foreach ($navigation as $index => $item) {
-        $href = strtolower((string) ($item['href'] ?? ''));
-
-        if (str_contains($href, 'cohorts')) {
-            $insertAt = $index + 1;
-            break;
-        }
-
-        if (str_contains($href, 'awards-and-recognitions') || str_contains($href, 'about-shweta')) {
-            $insertAt = $index + 1;
-        }
-    }
-
-    array_splice($navigation, $insertAt, 0, [$eventsLink]);
-}
-
+$navigation = site_navigation(
+    $site['navigation'] ?? [],
+    empty($site['header_navigation_managed']),
+    true
+);
 $brandHref = $currentPage === 'home' ? '#top' : url_path();
+$navItemData = static function (array $item) use ($currentPage): array {
+    $class = site_navigation_item_classes($item);
+    $label = (string) ($item['label'] ?? '');
+    $href = (string) ($item['href'] ?? '#');
+    $isCurrent = site_navigation_is_current($item, $currentPage);
+
+    return [
+        'label' => $label,
+        'href' => $href,
+        'displayHref' => site_navigation_display_href($href, $currentPage),
+        'class' => trim($class . ' ' . ($isCurrent ? 'is-current' : '')),
+        'isCurrent' => $isCurrent,
+        'isScheduleCta' => site_navigation_is_schedule_cta([
+            'label' => $label,
+            'href' => $href,
+            'class' => $class,
+        ]),
+    ];
+};
 ?>
 <nav id="nav">
   <a href="<?= e($brandHref) ?>" class="brand"><?= e($site['identity']['first_name']) ?> <b><?= e($site['identity']['last_name']) ?></b></a>
@@ -123,33 +35,11 @@ $brandHref = $currentPage === 'home' ? '#top' : url_path();
     </button>
     <div class="links desktop-links">
       <?php foreach ($navigation as $item): ?>
-        <?php
-        $class = (string) ($item['class'] ?? '');
-        $label = (string) ($item['label'] ?? '');
-        $href = (string) ($item['href'] ?? '#');
-        if (str_contains($href, 'about-shweta') && ! str_contains($class, 'nav-about')) {
-            $class = trim($class . ' nav-about');
-        }
-        if (str_contains($href, 'awards-and-recognitions') && ! str_contains($class, 'nav-awards')) {
-            $class = trim($class . ' nav-awards');
-        }
-        if (str_contains($href, 'cohorts') && ! str_contains($class, 'nav-cohorts')) {
-            $class = trim($class . ' nav-cohorts');
-        }
-        if (str_contains($href, 'events') && ! str_contains($class, 'nav-events')) {
-            $class = trim($class . ' nav-events');
-        }
-        $displayHref = $currentPage !== 'home' && str_starts_with($href, '#') ? url_path($href) : $href;
-        $isCurrent = ($currentPage === 'about' && str_contains($href, 'about-shweta'))
-            || ($currentPage === 'awards' && str_contains($href, 'awards-and-recognitions'))
-            || ($currentPage === 'cohorts' && str_contains($href, 'cohorts'))
-            || ($currentPage === 'events' && str_contains($href, 'events'));
-        $isScheduleCta = str_contains($class, 'cta') && ($href === '#schedule' || stripos($label, 'schedule') !== false);
-        ?>
-        <?php if ($isScheduleCta): ?>
-          <button class="<?= e($class) ?>" type="button" data-schedule-open><?= e($label) ?></button>
+        <?php $navItem = $navItemData($item); ?>
+        <?php if ($navItem['isScheduleCta']): ?>
+          <button class="<?= e($navItem['class']) ?>" type="button" data-schedule-open><?= e($navItem['label']) ?></button>
         <?php else: ?>
-          <a href="<?= e($displayHref) ?>"<?= $class !== '' || $isCurrent ? ' class="' . e(trim($class . ' ' . ($isCurrent ? 'is-current' : ''))) . '"' : '' ?><?= $isCurrent ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+          <a href="<?= e($navItem['displayHref']) ?>"<?= $navItem['class'] !== '' ? ' class="' . e($navItem['class']) . '"' : '' ?><?= $navItem['isCurrent'] ? ' aria-current="page"' : '' ?><?= external_link_attrs($item) ?>><?= e($navItem['label']) ?></a>
         <?php endif; ?>
       <?php endforeach; ?>
     </div>
@@ -168,35 +58,13 @@ $brandHref = $currentPage === 'home' ? '#top' : url_path();
       </div>
       <div class="mobile-menu-links">
         <?php foreach ($navigation as $item): ?>
-      <?php
-      $class = (string) ($item['class'] ?? '');
-      $label = (string) ($item['label'] ?? '');
-      $href = (string) ($item['href'] ?? '#');
-      if (str_contains($href, 'about-shweta') && ! str_contains($class, 'nav-about')) {
-          $class = trim($class . ' nav-about');
-      }
-      if (str_contains($href, 'awards-and-recognitions') && ! str_contains($class, 'nav-awards')) {
-          $class = trim($class . ' nav-awards');
-      }
-      if (str_contains($href, 'cohorts') && ! str_contains($class, 'nav-cohorts')) {
-          $class = trim($class . ' nav-cohorts');
-      }
-      if (str_contains($href, 'events') && ! str_contains($class, 'nav-events')) {
-          $class = trim($class . ' nav-events');
-      }
-      $displayHref = $currentPage !== 'home' && str_starts_with($href, '#') ? url_path($href) : $href;
-      $isCurrent = ($currentPage === 'about' && str_contains($href, 'about-shweta'))
-          || ($currentPage === 'awards' && str_contains($href, 'awards-and-recognitions'))
-          || ($currentPage === 'cohorts' && str_contains($href, 'cohorts'))
-          || ($currentPage === 'events' && str_contains($href, 'events'));
-      $isScheduleCta = str_contains($class, 'cta') && ($href === '#schedule' || stripos($label, 'schedule') !== false);
-      ?>
-      <?php if ($isScheduleCta): ?>
-            <button class="<?= e(trim('mobile-menu-link ' . $class)) ?>" type="button" data-schedule-open><?= e($label) ?></button>
-      <?php else: ?>
-            <a href="<?= e($displayHref) ?>" class="<?= e(trim('mobile-menu-link ' . $class . ' ' . ($isCurrent ? 'is-current' : ''))) ?>"<?= $isCurrent ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
-      <?php endif; ?>
-    <?php endforeach; ?>
+          <?php $navItem = $navItemData($item); ?>
+          <?php if ($navItem['isScheduleCta']): ?>
+            <button class="<?= e(trim('mobile-menu-link ' . $navItem['class'])) ?>" type="button" data-schedule-open><?= e($navItem['label']) ?></button>
+          <?php else: ?>
+            <a href="<?= e($navItem['displayHref']) ?>" class="<?= e(trim('mobile-menu-link ' . $navItem['class'])) ?>"<?= $navItem['isCurrent'] ? ' aria-current="page"' : '' ?><?= external_link_attrs($item) ?>><?= e($navItem['label']) ?></a>
+          <?php endif; ?>
+        <?php endforeach; ?>
       </div>
     </div>
   </div>
