@@ -25,6 +25,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="m10 9 5 3-5 3z"/><path d="M4 19l4-4h12"/></svg>
       <span>Cohorts</span>
     </a>
+    <a class="nav-item<?= $active === 'cohort-categories' ? ' active' : '' ?>" href="<?= e(admin_cohort_categories_url()) ?>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h7v7H4z"/><path d="M13 6h7v4h-7z"/><path d="M13 13h7v5h-7z"/><path d="M4 16h7v3H4z"/></svg>
+      <span>Cohort Categories</span>
+    </a>
     <a class="nav-item<?= $active === 'about' ? ' active' : '' ?>" href="<?= e(admin_about_url()) ?>">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c.7-3.6 3.4-5.6 7-5.6s6.3 2 7 5.6"/></svg>
       <span>About</span>

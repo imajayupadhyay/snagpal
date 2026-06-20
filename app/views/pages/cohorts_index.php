@@ -5,6 +5,7 @@ $items = is_array($cohortItems ?? null) ? $cohortItems : cohort_items(is_array($
 $featured = $items[0] ?? null;
 $schedule = $site['schedule'] ?? [];
 $pageContent = is_array($site['cohorts_page'] ?? null) ? $site['cohorts_page'] : cohorts_page_default_content();
+$cohortCategories = cohort_categories_for_filter($items);
 ?>
 <main class="cohorts-main">
   <header class="about-hero cohorts-archive-hero" id="top">
@@ -66,9 +67,18 @@ $pageContent = is_array($site['cohorts_page'] ?? null) ? $site['cohorts_page'] :
     <?php if ($items === []): ?>
       <p class="cohorts-empty reveal">No cohorts have been published yet.</p>
     <?php else: ?>
-      <div class="cohorts-archive-grid">
+      <?php if ($cohortCategories !== []): ?>
+        <div class="cohort-tabs" role="tablist" aria-label="Filter cohorts by category" data-cohort-tabs>
+          <button type="button" class="cohort-tab is-active" role="tab" aria-selected="true" data-cohort-tab="all">All <span><?= e((string) count($items)) ?></span></button>
+          <?php foreach ($cohortCategories as $category): ?>
+            <button type="button" class="cohort-tab" role="tab" aria-selected="false" data-cohort-tab="<?= e($category['slug']) ?>"><?= e($category['name']) ?> <span><?= e((string) $category['count']) ?></span></button>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+
+      <div class="cohorts-archive-grid" data-cohort-grid>
         <?php foreach ($items as $index => $item): ?>
-          <article class="cohorts-post-card reveal d<?= e((string) min($index + 1, 4)) ?>">
+          <article class="cohorts-post-card reveal d<?= e((string) min($index + 1, 4)) ?>" data-cohort-category="<?= e((string) ($item['category_slug'] ?? '')) ?>">
             <div class="cohorts-post-media">
               <?= cohort_video_html((string) ($item['video'] ?? ''), (string) ($item['title'] ?? ''), (string) ($item['poster'] ?? '')) ?>
             </div>
@@ -84,6 +94,7 @@ $pageContent = is_array($site['cohorts_page'] ?? null) ? $site['cohorts_page'] :
           </article>
         <?php endforeach; ?>
       </div>
+      <p class="cohorts-empty cohorts-empty-filtered" data-cohort-empty hidden>No cohorts in this category yet.</p>
     <?php endif; ?>
   </section>
 

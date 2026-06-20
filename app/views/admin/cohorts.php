@@ -161,6 +161,7 @@ ob_start();
               <tr>
                 <th>Cohort</th>
                 <th>Slug</th>
+                <th>Category</th>
                 <th>Status</th>
                 <th>Publish</th>
                 <th>Order</th>
@@ -176,6 +177,7 @@ ob_start();
                     <?php if (! empty($cohort['excerpt'])): ?><br><span class="muted"><?= e($cohort['excerpt']) ?></span><?php endif; ?>
                   </td>
                   <td><code><?= e($cohort['slug'] ?? '') ?></code></td>
+                  <td><?= $cohort['category_name'] ? e($cohort['category_name']) : '<span class="muted">Uncategorized</span>' ?></td>
                   <td><span class="status-pill <?= e((string) ($cohort['status'] ?? 'draft')) ?>"><?= e(ucfirst((string) ($cohort['status'] ?? 'draft'))) ?></span></td>
                   <td><?= e($formatDateTime($cohort['published_at'] ?? null)) ?></td>
                   <td><?= e((string) ($cohort['sort_order'] ?? 0)) ?></td>
@@ -223,6 +225,16 @@ ob_start();
           <div class="field">
             <label for="cohort_meta">Meta label</label>
             <input id="cohort_meta" name="meta_label" value="<?= e($form['meta_label']) ?>" maxlength="120" placeholder="Cohort 01 · AI Governance">
+          </div>
+          <div class="field">
+            <label for="cohort_category">Category</label>
+            <select id="cohort_category" name="category_id">
+              <option value="">Uncategorized</option>
+              <?php foreach (($categories ?? []) as $category): ?>
+                <option value="<?= e((string) $category['id']) ?>"<?= (int) ($form['category_id'] ?? 0) === (int) $category['id'] ? ' selected' : '' ?>><?= e($category['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+            <p class="hint">Controls which tab this cohort appears under on the public Cohorts page. <a href="<?= e(admin_cohort_categories_url()) ?>">Manage categories</a>.</p>
           </div>
           <div class="field">
             <label for="cohort_status">Status</label>

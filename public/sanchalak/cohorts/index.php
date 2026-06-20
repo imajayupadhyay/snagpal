@@ -67,9 +67,11 @@ try {
 
     $cohorts = cohort_admin_all();
     $overview = cohort_admin_counts();
+    $categories = cohort_category_admin_all();
 } catch (Throwable) {
     $cohorts = [];
     $overview = cohort_admin_counts_fallback();
+    $categories = [];
     $errors[] = 'The cohorts table is not ready. Run php scripts/migrate.php from the portfolio folder.';
 }
 
@@ -77,6 +79,7 @@ render('admin/cohorts', [
     'admin' => $admin,
     'cohorts' => $cohorts,
     'overview' => $overview,
+    'categories' => $categories,
     'form' => $form,
     'editing' => $editing,
     'pageContent' => $pageContent,

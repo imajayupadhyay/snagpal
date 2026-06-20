@@ -8,6 +8,7 @@ function cohort_admin_default(): array
         'id' => null,
         'title' => '',
         'slug' => '',
+        'category_id' => null,
         'meta_label' => '',
         'excerpt' => '',
         'description' => '',
@@ -45,9 +46,12 @@ function cohort_admin_source_options(): array
 function cohort_admin_all(): array
 {
     return db()->query(
-        'SELECT id, title, slug, meta_label, excerpt, status, is_featured, sort_order, published_at, updated_at
+        'SELECT cohorts.id, cohorts.title, cohorts.slug, cohorts.meta_label, cohorts.excerpt, cohorts.status,
+                cohorts.is_featured, cohorts.sort_order, cohorts.published_at, cohorts.updated_at,
+                cohorts.category_id, cohort_categories.name AS category_name
          FROM cohorts
-         ORDER BY is_featured DESC, sort_order ASC, COALESCE(published_at, created_at) DESC, id DESC'
+         LEFT JOIN cohort_categories ON cohort_categories.id = cohorts.category_id
+         ORDER BY cohorts.is_featured DESC, cohorts.sort_order ASC, COALESCE(cohorts.published_at, cohorts.created_at) DESC, cohorts.id DESC'
     )->fetchAll();
 }
 
@@ -115,6 +119,7 @@ function cohort_admin_normalize(array $cohort): array
         'id' => isset($cohort['id']) ? (int) $cohort['id'] : null,
         'title' => (string) ($cohort['title'] ?? ''),
         'slug' => (string) ($cohort['slug'] ?? ''),
+        'category_id' => ! empty($cohort['category_id']) ? (int) $cohort['category_id'] : null,
         'meta_label' => (string) ($cohort['meta_label'] ?? ''),
         'excerpt' => (string) ($cohort['excerpt'] ?? ''),
         'description' => (string) ($cohort['description'] ?? ''),
@@ -150,10 +155,13 @@ function cohort_admin_from_post(array $post, ?array $current = null): array
         $slug = cohort_slug($title);
     }
 
+    $categoryId = (int) ($post['category_id'] ?? 0);
+
     return [
         'id' => $current['id'],
         'title' => $title,
         'slug' => cohort_slug($slug),
+        'category_id' => $categoryId > 0 ? $categoryId : null,
         'meta_label' => homepage_text($post['meta_label'] ?? ''),
         'excerpt' => homepage_textarea($post['excerpt'] ?? ''),
         'description' => homepage_textarea($post['description'] ?? ''),
@@ -259,6 +267,7 @@ function cohort_admin_save(array $cohort, int $adminId): int
                 'UPDATE cohorts
                  SET title = :title,
                      slug = :slug,
+                     category_id = :category_id,
                      meta_label = :meta_label,
                      excerpt = :excerpt,
                      description = :description,
@@ -282,12 +291,12 @@ function cohort_admin_save(array $cohort, int $adminId): int
         } else {
             $statement = $pdo->prepare(
                 'INSERT INTO cohorts (
-                    title, slug, meta_label, excerpt, description, content,
+                    title, slug, category_id, meta_label, excerpt, description, content,
                     video_source_type, video_url, video_path, poster_image,
                     resource_label, resource_url, takeaways_json, status, is_featured,
                     sort_order, published_at, created_by, updated_by
                 ) VALUES (
-                    :title, :slug, :meta_label, :excerpt, :description, :content,
+                    :title, :slug, :category_id, :meta_label, :excerpt, :description, :content,
                     :video_source_type, :video_url, :video_path, :poster_image,
                     :resource_label, :resource_url, :takeaways_json, :status, :is_featured,
                     :sort_order, :published_at, :created_by, :updated_by
@@ -326,6 +335,7 @@ function cohort_admin_statement_params(array $cohort, int $adminId): array
     return [
         'title' => (string) $cohort['title'],
         'slug' => (string) $cohort['slug'],
+        'category_id' => ! empty($cohort['category_id']) ? (int) $cohort['category_id'] : null,
         'meta_label' => cohort_admin_nullable($cohort['meta_label'] ?? ''),
         'excerpt' => cohort_admin_nullable($cohort['excerpt'] ?? ''),
         'description' => cohort_admin_nullable($cohort['description'] ?? ''),
@@ -445,11 +455,14 @@ function cohort_public_from_row(array $row): array
     $cohort = cohort_admin_normalize($row);
     $description = $cohort['description'] !== '' ? $cohort['description'] : $cohort['excerpt'];
     $video = $cohort['video_source_type'] === 'upload' ? $cohort['video_path'] : $cohort['video_url'];
+    $category = $cohort['category_id'] !== null ? (cohort_categories_lookup()[$cohort['category_id']] ?? null) : null;
 
     return [
         'id' => $cohort['id'],
         'title' => $cohort['title'],
         'slug' => $cohort['slug'],
+        'category_slug' => $category['slug'] ?? '',
+        'category_name' => $category['name'] ?? '',
         'meta' => $cohort['meta_label'] !== '' ? $cohort['meta_label'] : 'Cohort',
         'excerpt' => $cohort['excerpt'],
         'description' => $description,

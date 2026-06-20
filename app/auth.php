@@ -103,6 +103,13 @@ function admin_recommendations_url(array $query = []): string
     return $query === [] ? $url : $url . '?' . http_build_query($query);
 }
 
+function admin_cohort_categories_url(array $query = []): string
+{
+    $url = url_path('sanchalak/cohort-categories/');
+
+    return $query === [] ? $url : $url . '?' . http_build_query($query);
+}
+
 function admin_schedule_url(): string
 {
     return url_path('sanchalak/schedule/');

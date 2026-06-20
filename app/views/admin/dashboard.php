@@ -28,6 +28,12 @@
         <p>Create and manage cohort posts with video, excerpts, article content, links, and publish status.</p>
         <span class="go">Manage cohorts &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_cohort_categories_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h7v7H4z"/><path d="M13 6h7v4h-7z"/><path d="M13 13h7v5h-7z"/><path d="M4 16h7v3H4z"/></svg></span>
+        <h2>Cohort Categories</h2>
+        <p>Create the category tabs shown on the public Cohorts page, and assign each cohort to one.</p>
+        <span class="go">Manage categories &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(admin_about_url()) ?>">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c.7-3.6 3.4-5.6 7-5.6s6.3 2 7 5.6"/></svg></span>
         <h2>About Page</h2>

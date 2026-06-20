@@ -22,6 +22,7 @@ require APP_PATH . '/database.php';
 require APP_PATH . '/mailer.php';
 require APP_PATH . '/homepage.php';
 require APP_PATH . '/cohorts.php';
+require APP_PATH . '/cohort_categories.php';
 require APP_PATH . '/events.php';
 require APP_PATH . '/about_page.php';
 require APP_PATH . '/awards_page.php';

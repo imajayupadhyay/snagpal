@@ -470,6 +470,38 @@
     }
   }
 
+  /* cohort category tabs */
+  var cohortTabs=document.querySelector('[data-cohort-tabs]');
+  var cohortGrid=document.querySelector('[data-cohort-grid]');
+  if(cohortTabs&&cohortGrid){
+    var cohortCards=cohortGrid.querySelectorAll('[data-cohort-category]');
+    var cohortEmpty=document.querySelector('[data-cohort-empty]');
+
+    cohortTabs.addEventListener('click',function(event){
+      var tab=event.target.closest('[data-cohort-tab]');
+      if(!tab){return;}
+
+      var category=tab.getAttribute('data-cohort-tab');
+      var visibleCount=0;
+
+      cohortTabs.querySelectorAll('[data-cohort-tab]').forEach(function(btn){
+        var isActive=btn===tab;
+        btn.classList.toggle('is-active',isActive);
+        btn.setAttribute('aria-selected',isActive?'true':'false');
+      });
+
+      cohortCards.forEach(function(card){
+        var matches=category==='all'||card.getAttribute('data-cohort-category')===category;
+        card.classList.toggle('is-hidden',!matches);
+        if(matches){visibleCount++;}
+      });
+
+      if(cohortEmpty){
+        cohortEmpty.hidden=visibleCount!==0;
+      }
+    });
+  }
+
   /* nav shrink */
   var nav=document.getElementById('nav');
   window.addEventListener('scroll',function(){nav.classList.toggle('shrink',window.scrollY>50);},{passive:true});
