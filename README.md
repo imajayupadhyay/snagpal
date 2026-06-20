@@ -37,6 +37,19 @@ Then open:
 - Site: http://localhost:8000
 - Admin login: http://localhost:8000/sanchalak/
 
+## Database migrations
+
+Migrations are incremental and tracked in a `schema_migrations` ledger, so each
+file in `database/migrations/` runs exactly once — `php scripts/migrate.php` is
+safe to run on every deploy.
+
+- **Add a schema change**: create a new numbered file, e.g.
+  `database/migrations/006_add_something.sql`, then run `php scripts/migrate.php`
+  (or trigger the deploy pipeline with migrations enabled). Only the new file runs.
+- **Adopt the ledger on an already-provisioned database** (one that predates the
+  ledger): run `php scripts/migrate.php --baseline` once to mark existing
+  migrations as applied without re-running them.
+
 ## Configuration
 
 All configuration lives in `.env` (copy from `.env.example`):

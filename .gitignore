@@ -12,6 +12,9 @@
 !/public/uploads/.gitkeep
 !/public/uploads/homepage/.gitkeep
 
+# CI / deployment pipeline (kept out of the repo)
+Jenkinsfile
+
 # Logs
 *.log
 
