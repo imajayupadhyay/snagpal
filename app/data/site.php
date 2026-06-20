@@ -24,9 +24,7 @@ return [
     ],
     'navigation' => [
         ['label' => 'About Shweta', 'href' => '/about-shweta/', 'class' => 'nav-about'],
-        ['label' => 'Expertise', 'href' => '#expertise'],
-        ['label' => 'Focus Areas', 'href' => '#focus'],
-        ['label' => 'Research', 'href' => '#research'],
+        ['label' => 'Awards & Recognitions', 'href' => '/awards-and-recognitions/', 'class' => 'nav-awards'],
         ['label' => 'Schedule a Meet', 'href' => '#schedule', 'class' => 'cta'],
     ],
     'hero' => [

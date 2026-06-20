@@ -1,7 +1,17 @@
 <?php
 $currentPage = (string) ($currentPage ?? 'home');
 $navigation = array_values($site['navigation'] ?? []);
+$hiddenNavigationLabels = ['expertise', 'focus areas', 'research'];
+$hiddenNavigationHrefs = ['#expertise', '#focus', '#research'];
+$navigation = array_values(array_filter($navigation, static function (array $item) use ($hiddenNavigationLabels, $hiddenNavigationHrefs): bool {
+    $label = strtolower(trim((string) ($item['label'] ?? '')));
+    $href = strtolower(trim((string) ($item['href'] ?? '')));
+
+    return ! in_array($label, $hiddenNavigationLabels, true)
+        && ! in_array($href, $hiddenNavigationHrefs, true);
+}));
 $hasAboutLink = false;
+$hasAwardsLink = false;
 
 foreach ($navigation as $item) {
     $label = strtolower((string) ($item['label'] ?? ''));
@@ -9,7 +19,10 @@ foreach ($navigation as $item) {
 
     if ($label === 'about shweta' || str_contains($href, 'about-shweta')) {
         $hasAboutLink = true;
-        break;
+    }
+
+    if ($label === 'awards and recognitions' || str_contains($href, 'awards-and-recognitions')) {
+        $hasAwardsLink = true;
     }
 }
 
@@ -19,6 +32,26 @@ if (! $hasAboutLink) {
         'href' => url_path('about-shweta/'),
         'class' => 'nav-about',
     ]);
+}
+
+if (! $hasAwardsLink) {
+    $awardsLink = [
+        'label' => 'Awards & Recognitions',
+        'href' => url_path('awards-and-recognitions/'),
+        'class' => 'nav-awards',
+    ];
+    $insertAt = 0;
+
+    foreach ($navigation as $index => $item) {
+        $href = strtolower((string) ($item['href'] ?? ''));
+
+        if (str_contains($href, 'about-shweta')) {
+            $insertAt = $index + 1;
+            break;
+        }
+    }
+
+    array_splice($navigation, $insertAt, 0, [$awardsLink]);
 }
 
 $brandHref = $currentPage === 'home' ? '#top' : url_path();
@@ -39,8 +72,12 @@ $brandHref = $currentPage === 'home' ? '#top' : url_path();
         if (str_contains($href, 'about-shweta') && ! str_contains($class, 'nav-about')) {
             $class = trim($class . ' nav-about');
         }
+        if (str_contains($href, 'awards-and-recognitions') && ! str_contains($class, 'nav-awards')) {
+            $class = trim($class . ' nav-awards');
+        }
         $displayHref = $currentPage !== 'home' && str_starts_with($href, '#') ? url_path($href) : $href;
-        $isCurrent = $currentPage === 'about' && str_contains($href, 'about-shweta');
+        $isCurrent = ($currentPage === 'about' && str_contains($href, 'about-shweta'))
+            || ($currentPage === 'awards' && str_contains($href, 'awards-and-recognitions'));
         $isScheduleCta = str_contains($class, 'cta') && ($href === '#schedule' || stripos($label, 'schedule') !== false);
         ?>
         <?php if ($isScheduleCta): ?>
@@ -72,8 +109,12 @@ $brandHref = $currentPage === 'home' ? '#top' : url_path();
       if (str_contains($href, 'about-shweta') && ! str_contains($class, 'nav-about')) {
           $class = trim($class . ' nav-about');
       }
+      if (str_contains($href, 'awards-and-recognitions') && ! str_contains($class, 'nav-awards')) {
+          $class = trim($class . ' nav-awards');
+      }
       $displayHref = $currentPage !== 'home' && str_starts_with($href, '#') ? url_path($href) : $href;
-      $isCurrent = $currentPage === 'about' && str_contains($href, 'about-shweta');
+      $isCurrent = ($currentPage === 'about' && str_contains($href, 'about-shweta'))
+          || ($currentPage === 'awards' && str_contains($href, 'awards-and-recognitions'));
       $isScheduleCta = str_contains($class, 'cta') && ($href === '#schedule' || stripos($label, 'schedule') !== false);
       ?>
       <?php if ($isScheduleCta): ?>

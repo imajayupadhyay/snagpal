@@ -384,6 +384,59 @@
     color:#C9DAD5}
   .about-closing-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto}
 
+  /* ---------- awards page ---------- */
+  .awards-main{overflow:hidden}
+  .awards-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--accent-tint) 74%,transparent),transparent 50%),
+    linear-gradient(28deg,transparent 62%,color-mix(in srgb,#B88A44 14%,transparent))}
+  .awards-hero-card{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg-2);
+    box-shadow:0 30px 70px -36px var(--shadow)}
+  .awards-hero-image{aspect-ratio:4/3;background:var(--accent-tint);overflow:hidden}
+  .awards-hero-image img{width:100%;height:100%;object-fit:cover;object-position:center 25%;transition:transform 1.1s var(--ease)}
+  @media(hover:hover){.awards-hero-card:hover .awards-hero-image img{transform:scale(1.035)}}
+  .awards-hero-meta{padding:clamp(1.25rem,2.5vw,1.8rem)}
+  .awards-hero-meta .mono{color:var(--accent)}
+  .awards-hero-meta strong{display:block;margin-top:0.65rem;font-family:var(--cond);font-weight:700;text-transform:uppercase;
+    font-size:clamp(1.22rem,2.1vw,1.7rem);line-height:1.05}
+  .awards-hero-meta p{margin-top:0.8rem;color:var(--muted);font-size:0.96rem;line-height:1.6;font-weight:300}
+  .awards-stat-row .about-stat:nth-child(2) .about-stat-value{color:#B88A44}
+  .awards-stat-row .about-stat:nth-child(3) .about-stat-value{color:#A65F4A}
+  .awards-stat-row .about-stat:nth-child(4) .about-stat-value{color:#415D7A}
+
+  .awards-ledger{background:var(--bg-2)}
+  .awards-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+  .award-card{display:grid;grid-template-rows:auto 1fr;border:1px solid var(--line);border-radius:6px;overflow:hidden;
+    background:var(--bg);min-height:310px;transition:border-color .35s var(--ease),transform .35s var(--ease),box-shadow .35s var(--ease)}
+  .award-card:nth-child(2){border-top-color:#B88A44}
+  .award-card:nth-child(3){border-top-color:#A65F4A}
+  .award-card:nth-child(4){border-top-color:#415D7A}
+  @media(hover:hover){.award-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));
+    transform:translateY(-3px);box-shadow:0 24px 48px -34px var(--shadow)}}
+  .award-card-media{aspect-ratio:16/9;background:var(--accent-tint);overflow:hidden}
+  .award-card-media img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s var(--ease)}
+  @media(hover:hover){.award-card:hover .award-card-media img{transform:scale(1.045)}}
+  .award-card-body{display:flex;flex-direction:column;gap:0.85rem;padding:clamp(1.25rem,2.5vw,1.8rem)}
+  .award-card-top{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+  .award-card-top span,.award-card-top em{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase}
+  .award-card-top span{color:var(--accent)}
+  .award-card-top em{font-style:normal;color:var(--muted);text-align:right}
+  .award-card h3{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.2rem,2.3vw,1.75rem);
+    line-height:1.06}
+  .award-card p{margin-top:auto;color:var(--muted);font-size:0.98rem;line-height:1.64;font-weight:300}
+
+  .awards-standards{display:grid;grid-template-columns:0.78fr 1.22fr;gap:clamp(2rem,5vw,5rem);
+    background:color-mix(in srgb,var(--accent-deep) 92%,#1F2530);color:#EAF1EE;align-items:start}
+  .awards-standards .mono{color:#9DC3BB}
+  .awards-standards-copy h2{margin-top:0.9rem;font-family:var(--cond);font-weight:700;text-transform:uppercase;
+    letter-spacing:0.005em;font-size:clamp(2rem,4.6vw,3.7rem);line-height:0.95;color:#fff}
+  .awards-standards-copy p{margin-top:1.4rem;color:#C9DAD5;font-size:clamp(1rem,1.4vw,1.15rem);line-height:1.68;font-weight:300}
+  .awards-standards-grid{display:grid;gap:1px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.14)}
+  .awards-standard-card{display:grid;grid-template-columns:auto 0.8fr 1.2fr;gap:clamp(1rem,2.6vw,2rem);
+    align-items:start;background:rgba(255,255,255,0.055);padding:clamp(1.35rem,2.5vw,1.9rem)}
+  .awards-standard-card span{font-family:var(--mono);font-size:0.72rem;color:#69C7B6;padding-top:0.25rem}
+  .awards-standard-card h3{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.08rem,1.8vw,1.35rem);
+    line-height:1.08;color:#fff}
+  .awards-standard-card p{color:#C8DAD5;font-size:0.96rem;line-height:1.62;font-weight:300}
+
   /* in her words — floating quote */
   .voice{background:var(--accent-tint);position:relative;overflow:hidden}
   .voice .qmark{position:absolute;top:-0.2em;left:calc(var(--pad) - 0.04em);font-family:var(--grunge);
@@ -567,6 +620,9 @@
     .about-media-grid{grid-template-columns:1fr}
     .about-closing{display:grid;align-items:start}
     .about-closing-actions{justify-content:flex-start}
+    .awards-hero-card{max-width:460px}
+    .awards-grid{grid-template-columns:1fr}
+    .awards-standards{grid-template-columns:1fr}
   }
   @media(max-width:600px){
     nav{padding:0.85rem var(--pad)}
@@ -606,6 +662,12 @@
     .about-expertise-row p{margin-top:0.2rem}
     .about-closing h2{font-size:clamp(3.4rem,18vw,5.8rem)}
     .about-closing-actions{display:grid;justify-items:start}
+    .awards-hero-card{max-width:none}
+    .award-card{min-height:auto}
+    .award-card-top{align-items:flex-start;flex-direction:column;gap:0.35rem}
+    .award-card-top em{text-align:left}
+    .awards-standard-card{grid-template-columns:1fr;gap:0.45rem}
+    .awards-standards-copy h2{font-size:clamp(2rem,10vw,3.25rem)}
     .meeting-modal{padding:0.75rem}
     .meeting-dialog{max-height:92vh}
     .meeting-grid{grid-template-columns:1fr}
