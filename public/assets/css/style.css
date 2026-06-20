@@ -273,6 +273,7 @@
     background-size:54px 54px;mask-image:linear-gradient(to bottom,#000,transparent 78%)}
   .about-hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(280px,0.62fr);
     gap:clamp(2rem,5vw,5rem);align-items:center}
+  .about-hero .kick{display:block;margin-bottom:clamp(1.35rem,3vw,2.2rem)}
   .about-hero h1{font-family:var(--cond);font-weight:700;text-transform:uppercase;
     font-size:clamp(3.2rem,9.2vw,8rem);line-height:0.9;letter-spacing:-0.005em}
   .about-hero h1 .a{color:var(--accent)}
@@ -801,6 +802,7 @@
     .res-row .kind{text-align:left}
     .about-hero{padding:clamp(6.4rem,20vh,7.6rem) var(--pad) clamp(2.8rem,8vh,3.8rem)}
     .about-hero-grid{gap:2rem}
+    .about-hero .kick{margin-bottom:1.15rem}
     .about-hero h1{font-size:clamp(3.1rem,15vw,4.8rem)}
     .about-actions{align-items:flex-start}
     .about-identity-panel{max-width:none}

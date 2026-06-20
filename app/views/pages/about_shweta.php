@@ -57,7 +57,6 @@ $pathItems = [
         <p class="about-lede reveal d3"><?= e($hero['lede'] ?? '') ?></p>
         <div class="about-actions reveal d4">
           <button class="cta" type="button" data-schedule-open><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></button>
-          <a class="about-text-link" href="#research">Research & Engagement</a>
         </div>
       </div>
 

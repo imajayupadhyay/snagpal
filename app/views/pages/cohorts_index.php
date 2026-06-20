@@ -18,7 +18,6 @@ $schedule = $site['schedule'] ?? [];
         <p class="about-lede reveal d3"><?= e($cohorts['intro'] ?? 'Recordings and field notes from recent capability-building cohorts on AI governance and public-sector technology.') ?></p>
         <div class="about-actions reveal d4">
           <a class="about-text-link" href="#cohort-list">Browse Cohorts</a>
-          <button class="cta" type="button" data-schedule-open><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></button>
         </div>
       </div>
 

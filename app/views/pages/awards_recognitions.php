@@ -69,7 +69,6 @@ $standards = [
         <p class="about-role reveal d2"><?= e($hero['role'] ?? '') ?></p>
         <p class="about-lede reveal d3">A curated record of recognitions, institutional mandates, and public-sector engagements connected to AI governance, critical infrastructure technology, and responsible digital transformation.</p>
         <div class="about-actions reveal d4">
-          <a class="about-text-link" href="#recognitions">View Recognitions</a>
           <button class="cta" type="button" data-schedule-open><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></button>
         </div>
       </div>
