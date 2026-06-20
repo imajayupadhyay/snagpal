@@ -319,7 +319,9 @@ ob_start();
           <div class="field"><label>Heading</label><input name="schedule[heading]" value="<?= e($content['schedule']['heading'] ?? '') ?>"></div>
           <div class="field full"><label>Description</label><textarea name="schedule[description]" rows="3"><?= e($content['schedule']['description'] ?? '') ?></textarea></div>
           <div class="field full"><label>Email subject</label><input name="schedule[email_subject]" value="<?= e($content['schedule']['email_subject'] ?? '') ?>"></div>
+          <div class="field"><label>Button label</label><input name="schedule[cta_label]" value="<?= e($content['schedule']['cta_label'] ?? '') ?>" maxlength="80"></div>
         </div>
+        <p class="hint">The button label is shown on the closing "Let's talk" section of the About, Awards, Cohorts, and Events pages.</p>
       </section>
 
       <div class="sticky-actions">

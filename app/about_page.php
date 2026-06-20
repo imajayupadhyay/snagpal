@@ -145,6 +145,7 @@ function about_page_default_content(): array
         'schedule_eyebrow' => 'Schedule a Meet',
         'schedule_heading' => 'Let\'s talk.',
         'schedule_description' => 'For advisory conversations, speaking engagements, and collaboration on AI governance and public technology.',
+        'schedule_cta_label' => 'Request a meeting slot',
     ];
 }
 
@@ -231,6 +232,7 @@ function about_page_bootstrap_from_homepage(): array
     $seed['schedule_eyebrow'] = (string) ($schedule['eyebrow'] ?? $default['schedule_eyebrow']);
     $seed['schedule_heading'] = (string) ($schedule['heading'] ?? $default['schedule_heading']);
     $seed['schedule_description'] = (string) ($schedule['description'] ?? $default['schedule_description']);
+    $seed['schedule_cta_label'] = (string) ($schedule['cta_label'] ?? $default['schedule_cta_label']);
 
     return about_page_normalize($seed);
 }
@@ -336,6 +338,7 @@ function about_page_content_from_post(array $post): array
         'schedule_eyebrow' => homepage_text($post['schedule_eyebrow'] ?? $default['schedule_eyebrow']),
         'schedule_heading' => homepage_text($post['schedule_heading'] ?? $default['schedule_heading']),
         'schedule_description' => homepage_textarea($post['schedule_description'] ?? $default['schedule_description']),
+        'schedule_cta_label' => homepage_text($post['schedule_cta_label'] ?? $default['schedule_cta_label']),
     ];
 }
 

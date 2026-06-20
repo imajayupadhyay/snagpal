@@ -72,6 +72,11 @@ function admin_header_url(): string
     return url_path('sanchalak/header/');
 }
 
+function admin_footer_url(): string
+{
+    return url_path('sanchalak/footer/');
+}
+
 function admin_cohorts_url(array $query = []): string
 {
     $url = url_path('sanchalak/cohorts/');

@@ -116,7 +116,7 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
       <p><?= e($schedule['description'] ?? '') ?></p>
     </div>
     <div class="about-closing-actions">
-      <button class="cta" type="button" data-schedule-open>Request a meeting slot</button>
+      <button class="cta" type="button" data-schedule-open><?= e($schedule['cta_label'] ?? 'Request a meeting slot') ?></button>
       <?php if (! empty($identity['linkedin']['url'])): ?>
         <a class="about-text-link light" href="<?= e($identity['linkedin']['url']) ?>" target="_blank" rel="noopener"><?= e($identity['linkedin']['label'] ?? 'LinkedIn') ?></a>
       <?php endif; ?>

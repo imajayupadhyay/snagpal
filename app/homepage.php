@@ -103,6 +103,13 @@ function homepage_content_from_post(array $post, array $current): array
     $headerNavigationManaged = isset($post['navigation'])
         ? true
         : (bool) ($current['header_navigation_managed'] ?? false);
+    $footer = isset($post['footer']) && is_array($post['footer'])
+        ? [
+            'copyright_name' => homepage_text($post['footer']['copyright_name'] ?? ''),
+            'tagline' => homepage_text($post['footer']['tagline'] ?? ''),
+            'back_to_top_label' => homepage_text($post['footer']['back_to_top_label'] ?? ''),
+        ]
+        : ($current['footer'] ?? homepage_default_content()['footer']);
 
     return [
         'page' => [
@@ -126,6 +133,7 @@ function homepage_content_from_post(array $post, array $current): array
         ],
         'navigation' => $navigation,
         'header_navigation_managed' => $headerNavigationManaged,
+        'footer' => $footer,
         'hero' => [
             'kicker' => homepage_text($post['hero']['kicker'] ?? ''),
             'kicker_suffix' => homepage_text($post['hero']['kicker_suffix'] ?? ''),
@@ -176,6 +184,7 @@ function homepage_content_from_post(array $post, array $current): array
             'heading' => homepage_text($post['schedule']['heading'] ?? ''),
             'description' => homepage_textarea($post['schedule']['description'] ?? ''),
             'email_subject' => homepage_text($post['schedule']['email_subject'] ?? ''),
+            'cta_label' => homepage_text($post['schedule']['cta_label'] ?? ''),
         ],
     ];
 }

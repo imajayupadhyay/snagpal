@@ -96,7 +96,7 @@ $standards = array_values($awardsPage['standards']);
       <p><?= e($awardsPage['schedule_description']) ?></p>
     </div>
     <div class="about-closing-actions">
-      <button class="cta" type="button" data-schedule-open>Request a meeting slot</button>
+      <button class="cta" type="button" data-schedule-open><?= e($awardsPage['schedule_cta_label']) ?></button>
       <?php if (! empty($identity['linkedin']['url'])): ?>
         <a class="about-text-link light" href="<?= e($identity['linkedin']['url']) ?>" target="_blank" rel="noopener"><?= e($identity['linkedin']['label'] ?? 'LinkedIn') ?></a>
       <?php endif; ?>

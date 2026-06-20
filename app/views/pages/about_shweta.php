@@ -190,7 +190,7 @@ $profileParagraphs = array_values($aboutPage['profile_paragraphs_html']);
       <p><?= e($aboutPage['schedule_description']) ?></p>
     </div>
     <div class="about-closing-actions">
-      <button class="cta" type="button" data-schedule-open>Request a meeting slot</button>
+      <button class="cta" type="button" data-schedule-open><?= e($aboutPage['schedule_cta_label']) ?></button>
       <?php if (! empty($identity['linkedin']['url'])): ?>
         <a class="about-text-link light" href="<?= e($identity['linkedin']['url']) ?>" target="_blank" rel="noopener"><?= e($identity['linkedin']['label'] ?? 'LinkedIn') ?></a>
       <?php endif; ?>

@@ -22,6 +22,12 @@
         <p>Manage menu links for desktop and mobile navigation, including the header button text.</p>
         <span class="go">Manage header &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_footer_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h16"/><path d="M7 14l-3 2 3 2z"/></svg></span>
+        <h2>Footer</h2>
+        <p>Manage the copyright name, tagline, and back-to-top link shown at the bottom of every page.</p>
+        <span class="go">Manage footer &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(admin_cohorts_url()) ?>">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="m10 9 5 3-5 3z"/><path d="M4 19l4-4h12"/></svg></span>
         <h2>Cohorts</h2>

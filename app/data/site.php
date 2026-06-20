@@ -30,6 +30,11 @@ return [
         ['label' => 'Schedule a Meet', 'href' => '#schedule', 'class' => 'cta'],
     ],
     'header_navigation_managed' => false,
+    'footer' => [
+        'copyright_name' => 'Shweta Nagpal',
+        'tagline' => 'AI Governance - Public-Sector Technology',
+        'back_to_top_label' => 'Back to top ↑',
+    ],
     'hero' => [
         'kicker' => 'AI Governance',
         'kicker_suffix' => 'Public-Sector Technology',
@@ -254,5 +259,6 @@ return [
         'heading' => "Let's talk.",
         'description' => 'For advisory conversations, speaking engagements, and collaboration on AI governance and public technology.',
         'email_subject' => 'Meeting request - Shweta Nagpal',
+        'cta_label' => 'Request a meeting slot',
     ],
 ];

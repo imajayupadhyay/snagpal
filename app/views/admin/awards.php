@@ -209,6 +209,10 @@ ob_start();
             <label for="schedule_description">Description</label>
             <textarea id="schedule_description" name="schedule_description" rows="2"><?= e($pageContent['schedule_description']) ?></textarea>
           </div>
+          <div class="field">
+            <label for="schedule_cta_label">Button label</label>
+            <input id="schedule_cta_label" name="schedule_cta_label" value="<?= e($pageContent['schedule_cta_label']) ?>" maxlength="80">
+          </div>
         </div>
       </section>
 
