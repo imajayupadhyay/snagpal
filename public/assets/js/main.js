@@ -33,8 +33,8 @@
 
   /* loader */
   var loader=document.getElementById('loader'),countEl=document.getElementById('count'),bar=document.getElementById('lbar');
-  function reveals(){document.querySelectorAll('.hero .reveal, .about-hero .reveal').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},90*i);});
-    document.querySelectorAll('.hero .clip, .about-hero .clip').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},150+130*i);});
+  function reveals(){document.querySelectorAll('.hero .reveal, .about-hero .reveal, .cohort-detail-hero .reveal').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},90*i);});
+    document.querySelectorAll('.hero .clip, .about-hero .clip, .cohort-detail-hero .clip').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},150+130*i);});
     var hi=document.getElementById('heroImg');if(hi)hi.classList.add('in');}
   function finish(){document.body.classList.remove('loading');loader.classList.add('done');setTimeout(reveals,260);}
   if(reduce){countEl.textContent='100';bar.style.width='100%';finish();}

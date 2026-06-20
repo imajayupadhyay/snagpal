@@ -25,6 +25,7 @@ return [
     'navigation' => [
         ['label' => 'About Shweta', 'href' => '/about-shweta/', 'class' => 'nav-about'],
         ['label' => 'Awards & Recognitions', 'href' => '/awards-and-recognitions/', 'class' => 'nav-awards'],
+        ['label' => 'Cohorts', 'href' => '/cohorts/', 'class' => 'nav-cohorts'],
         ['label' => 'Schedule a Meet', 'href' => '#schedule', 'class' => 'cta'],
     ],
     'hero' => [

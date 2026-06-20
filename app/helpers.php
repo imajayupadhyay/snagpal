@@ -79,6 +79,50 @@ function external_link_attrs(array $item): string
     return ' target="_blank" rel="noopener"';
 }
 
+function cohort_slug(string $value): string
+{
+    $slug = strtolower(trim($value));
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+    $slug = trim($slug, '-');
+
+    return $slug !== '' ? $slug : 'cohort';
+}
+
+function cohort_items(array $cohorts): array
+{
+    $items = array_values(array_filter($cohorts['items'] ?? [], 'is_array'));
+    $seen = [];
+
+    foreach ($items as $index => $item) {
+        $baseSlug = cohort_slug((string) ($item['slug'] ?? $item['title'] ?? ('cohort-' . ($index + 1))));
+        $slug = $baseSlug;
+        $suffix = 2;
+
+        while (isset($seen[$slug])) {
+            $slug = $baseSlug . '-' . $suffix;
+            $suffix++;
+        }
+
+        $seen[$slug] = true;
+        $items[$index]['slug'] = $slug;
+        $items[$index]['index'] = $index + 1;
+        $items[$index]['detail_url'] = url_path('cohorts/detail/?slug=' . rawurlencode($slug));
+    }
+
+    return $items;
+}
+
+function cohort_find_by_slug(array $cohorts, string $slug): ?array
+{
+    foreach (cohort_items($cohorts) as $item) {
+        if (($item['slug'] ?? '') === $slug) {
+            return $item;
+        }
+    }
+
+    return null;
+}
+
 /**
  * Build the responsive embed markup for a cohort video.
  *
