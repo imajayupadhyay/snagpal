@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS meeting_bookings (
     KEY meeting_bookings_slot_index (meeting_slot_id),
     KEY meeting_bookings_email_index (visitor_email),
     KEY meeting_bookings_status_index (status),
+    -- ON UPDATE must not CASCADE: meeting_slot_id feeds the generated
+    -- column active_slot_id (added in 005), and MySQL forbids cascading
+    -- referential actions on a base column of a generated column (error 1901).
     CONSTRAINT meeting_bookings_slot_foreign
         FOREIGN KEY (meeting_slot_id) REFERENCES meeting_slots(id)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+        ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

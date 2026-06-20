@@ -54,7 +54,7 @@ function verify_csrf_token(?string $token): bool
 
 function admin_login_url(): string
 {
-    return url_path('admin-secure-login/');
+    return url_path('sanchalak/');
 }
 
 function admin_dashboard_url(): string
@@ -75,6 +75,11 @@ function admin_schedule_url(): string
 function admin_bookings_url(): string
 {
     return url_path('admin/bookings/');
+}
+
+function admin_users_url(): string
+{
+    return url_path('admin/users/');
 }
 
 function current_admin(): ?array
@@ -143,6 +148,150 @@ function require_admin(): array
     }
 
     return $admin;
+}
+
+/* ============================================================
+   Admin user management
+   ============================================================ */
+
+function admin_users_all(): array
+{
+    return db()->query(
+        'SELECT id, name, email, is_active, last_login_at, created_at
+         FROM admin_users
+         ORDER BY created_at ASC, id ASC'
+    )->fetchAll();
+}
+
+function admin_users_active_count(): int
+{
+    return (int) db()->query('SELECT COUNT(*) FROM admin_users WHERE is_active = 1')->fetchColumn();
+}
+
+/**
+ * Validate and create a new admin. Returns a list of errors (empty on success).
+ */
+function admin_create_user(array $post): array
+{
+    $name = trim((string) ($post['name'] ?? ''));
+    $email = strtolower(trim((string) ($post['email'] ?? '')));
+    $password = (string) ($post['password'] ?? '');
+    $confirm = (string) ($post['password_confirm'] ?? '');
+
+    $errors = admin_validate_identity($name, $email);
+    $errors = array_merge($errors, admin_validate_password($password, $confirm));
+
+    if ($errors !== []) {
+        return $errors;
+    }
+
+    $exists = db()->prepare('SELECT id FROM admin_users WHERE email = :email LIMIT 1');
+    $exists->execute(['email' => $email]);
+
+    if ($exists->fetch()) {
+        return ['An admin with that email already exists.'];
+    }
+
+    db()->prepare(
+        'INSERT INTO admin_users (name, email, password_hash, is_active)
+         VALUES (:name, :email, :hash, 1)'
+    )->execute([
+        'name' => $name,
+        'email' => $email,
+        'hash' => password_hash($password, PASSWORD_DEFAULT),
+    ]);
+
+    return [];
+}
+
+/**
+ * Validate and update an admin's password. Returns a list of errors (empty on success).
+ */
+function admin_update_password(int $id, array $post): array
+{
+    if ($id <= 0) {
+        return ['Invalid admin selected.'];
+    }
+
+    $password = (string) ($post['password'] ?? '');
+    $confirm = (string) ($post['password_confirm'] ?? '');
+
+    $errors = admin_validate_password($password, $confirm);
+
+    if ($errors !== []) {
+        return $errors;
+    }
+
+    $exists = db()->prepare('SELECT id FROM admin_users WHERE id = :id LIMIT 1');
+    $exists->execute(['id' => $id]);
+
+    if (! $exists->fetch()) {
+        return ['That admin no longer exists.'];
+    }
+
+    db()->prepare('UPDATE admin_users SET password_hash = :hash WHERE id = :id')->execute([
+        'hash' => password_hash($password, PASSWORD_DEFAULT),
+        'id' => $id,
+    ]);
+
+    return [];
+}
+
+/**
+ * Delete an admin. Guards against removing yourself or the last admin.
+ */
+function admin_delete_user(int $id, int $currentAdminId): array
+{
+    if ($id <= 0) {
+        return ['Invalid admin selected.'];
+    }
+
+    if ($id === $currentAdminId) {
+        return ['You cannot delete the admin you are signed in as.'];
+    }
+
+    if (admin_users_active_count() <= 1) {
+        return ['At least one admin must remain.'];
+    }
+
+    $statement = db()->prepare('DELETE FROM admin_users WHERE id = :id');
+    $statement->execute(['id' => $id]);
+
+    if ($statement->rowCount() === 0) {
+        return ['That admin no longer exists.'];
+    }
+
+    return [];
+}
+
+function admin_validate_identity(string $name, string $email): array
+{
+    $errors = [];
+
+    if (mb_strlen($name) < 2 || mb_strlen($name) > 120) {
+        $errors[] = 'Enter a name between 2 and 120 characters.';
+    }
+
+    if (! filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 190) {
+        $errors[] = 'Enter a valid email address.';
+    }
+
+    return $errors;
+}
+
+function admin_validate_password(string $password, string $confirm): array
+{
+    $errors = [];
+
+    if (strlen($password) < 8) {
+        $errors[] = 'Password must be at least 8 characters.';
+    }
+
+    if ($password !== $confirm) {
+        $errors[] = 'The password and confirmation do not match.';
+    }
+
+    return $errors;
 }
 
 function logout_admin(): void

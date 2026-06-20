@@ -28,6 +28,12 @@
         <p>Review confirmed meeting requests, see visitor details, and cancel bookings when needed.</p>
         <span class="go">View requests &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_users_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 13.4A5.5 5.5 0 0 1 20.5 18"/></svg></span>
+        <h2>Users</h2>
+        <p>Manage admin accounts — add a new admin or change passwords.</p>
+        <span class="go">Manage admins &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(url_path()) ?>" target="_blank" rel="noopener">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5H5V5h5"/></svg></span>
         <h2>Live site</h2>

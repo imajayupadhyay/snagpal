@@ -1,6 +1,6 @@
 # Admin Panel Placeholder
 
-The public admin panel files live under `public/admin` and `public/admin-secure-login`.
+The public admin panel files live under `public/admin` and `public/sanchalak`.
 
 Implemented:
 

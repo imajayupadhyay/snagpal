@@ -35,7 +35,7 @@ php -S localhost:8000 -t public
 Then open:
 
 - Site: http://localhost:8000
-- Admin login: http://localhost:8000/admin-secure-login/
+- Admin login: http://localhost:8000/sanchalak/
 
 ## Configuration
 
