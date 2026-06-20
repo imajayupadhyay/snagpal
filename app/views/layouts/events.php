@@ -1,7 +1,6 @@
 <?php
 $meetingSlots = schedule_available_slots();
 $meetingFlash = public_flash('meeting_booking');
-$contentView = (string) ($contentView ?? 'pages/cohorts_index');
 ?>
 <!DOCTYPE html>
 <html lang="<?= e($page['lang'] ?? 'en') ?>">
@@ -23,14 +22,10 @@ $contentView = (string) ($contentView ?? 'pages/cohorts_index');
   }catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
 </head>
-<body class="cohorts-page">
-<?php render('partials/nav', ['site' => $site, 'currentPage' => 'cohorts']); ?>
+<body class="events-page">
+<?php render('partials/nav', ['site' => $site, 'currentPage' => 'events']); ?>
 
-<?php render($contentView, [
-    'site' => $site,
-    'cohort' => $cohort ?? null,
-    'cohortItems' => $cohortItems ?? null,
-]); ?>
+<?php render('pages/events_index', ['site' => $site]); ?>
 
 <?php render('partials/footer', ['site' => $site]); ?>
 <?php render('partials/meeting_modal', ['slots' => $meetingSlots, 'flash' => $meetingFlash]); ?>

@@ -37,8 +37,13 @@
     document.querySelectorAll('.hero .clip, .about-hero .clip, .cohort-detail-hero .clip').forEach(function(el,i){setTimeout(function(){el.classList.add('in');},150+130*i);});
     var hi=document.getElementById('heroImg');if(hi)hi.classList.add('in');}
   function finish(){document.body.classList.remove('loading');loader.classList.add('done');setTimeout(reveals,260);}
-  if(reduce){countEl.textContent='100';bar.style.width='100%';finish();}
-  else{var n=0;var iv=setInterval(function(){n+=Math.floor(Math.random()*10)+4;if(n>=100){n=100;clearInterval(iv);}countEl.textContent=n;bar.style.width=n+'%';if(n===100)setTimeout(finish,340);},90);}
+  if(loader&&countEl&&bar){
+    if(reduce){countEl.textContent='100';bar.style.width='100%';finish();}
+    else{var n=0;var iv=setInterval(function(){n+=Math.floor(Math.random()*10)+4;if(n>=100){n=100;clearInterval(iv);}countEl.textContent=n;bar.style.width=n+'%';if(n===100)setTimeout(finish,340);},90);}
+  }else{
+    document.body.classList.remove('loading');
+    reveals();
+  }
 
   document.getElementById('yr').textContent=new Date().getFullYear();
 

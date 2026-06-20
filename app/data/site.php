@@ -26,6 +26,7 @@ return [
         ['label' => 'About Shweta', 'href' => '/about-shweta/', 'class' => 'nav-about'],
         ['label' => 'Awards & Recognitions', 'href' => '/awards-and-recognitions/', 'class' => 'nav-awards'],
         ['label' => 'Cohorts', 'href' => '/cohorts/', 'class' => 'nav-cohorts'],
+        ['label' => 'Events', 'href' => '/events/', 'class' => 'nav-events'],
         ['label' => 'Schedule a Meet', 'href' => '#schedule', 'class' => 'cta'],
     ],
     'hero' => [
@@ -207,6 +208,45 @@ return [
             ],
         ],
         'note' => '',
+    ],
+    'events' => [
+        'heading' => 'Upcoming & Past Events',
+        'intro' => 'Talks, workshops, roundtables, and public engagements on AI governance, critical infrastructure technology, and responsible public-sector adoption.',
+        'items' => [
+            [
+                'status' => 'Upcoming',
+                'meta' => 'Workshop - 2026',
+                'title' => 'Responsible AI for Public Institutions',
+                'description' => 'A practical session on moving from AI-governance principles to institutional workflows, accountability, and public trust.',
+                'video' => 'https://www.youtube.com/watch?v=ScMzIvxBSi4',
+                'poster' => '',
+            ],
+            [
+                'status' => 'Upcoming',
+                'meta' => 'Roundtable - 2026',
+                'title' => 'Critical Infrastructure & AI Readiness',
+                'description' => 'A discussion on readiness, resilience, data stewardship, and security for AI adoption across public infrastructure systems.',
+                'video' => 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+                'poster' => '',
+            ],
+            [
+                'status' => 'Past',
+                'meta' => 'Conference - 2026',
+                'title' => 'AI Conference & Workshop - Punjab School Education Board',
+                'description' => 'A public-sector AI engagement focused on responsible adoption of artificial intelligence in institutions.',
+                'video' => 'https://www.youtube.com/watch?v=ScMzIvxBSi4',
+                'poster' => '',
+            ],
+            [
+                'status' => 'Past',
+                'meta' => 'Engagement - 2026',
+                'title' => 'BBMB - 50 Years (1976-2026)',
+                'description' => 'Participation in the Board\'s golden-jubilee programme on technology and the future of public infrastructure.',
+                'video' => 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+                'poster' => '',
+            ],
+        ],
+        'note' => 'Static placeholder event videos can be replaced with uploaded files or official YouTube/Vimeo links from the admin workflow later.',
     ],
     'schedule' => [
         'eyebrow' => 'Schedule a Meet',

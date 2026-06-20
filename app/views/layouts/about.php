@@ -22,8 +22,7 @@ $meetingFlash = public_flash('meeting_booking');
   }catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
 </head>
-<body class="about-page loading">
-<?php render('partials/loader', ['site' => $site]); ?>
+<body class="about-page">
 <?php render('partials/nav', ['site' => $site, 'currentPage' => 'about']); ?>
 
 <?php render('pages/about_shweta', ['site' => $site]); ?>

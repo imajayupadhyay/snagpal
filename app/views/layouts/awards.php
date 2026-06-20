@@ -22,8 +22,7 @@ $meetingFlash = public_flash('meeting_booking');
   }catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
 </head>
-<body class="awards-page loading">
-<?php render('partials/loader', ['site' => $site]); ?>
+<body class="awards-page">
 <?php render('partials/nav', ['site' => $site, 'currentPage' => 'awards']); ?>
 
 <?php render('pages/awards_recognitions', ['site' => $site]); ?>
