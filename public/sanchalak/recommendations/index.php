@@ -22,6 +22,7 @@ try {
                 $errors = recommendation_admin_publish($id, (string) ($_POST['target'] ?? ''), (int) $admin['id']);
 
                 if ($errors === []) {
+                    admin_notification_mark_source_read('recommendation_submission', $id, (int) $admin['id']);
                     flash('success', 'Recommendation published.');
                     redirect(admin_recommendations_url());
                 }
@@ -29,6 +30,7 @@ try {
                 $errors = recommendation_admin_reject($id, (int) $admin['id']);
 
                 if ($errors === []) {
+                    admin_notification_mark_source_read('recommendation_submission', $id, (int) $admin['id']);
                     flash('success', 'Submission rejected.');
                     redirect(admin_recommendations_url());
                 }
@@ -36,6 +38,7 @@ try {
                 $errors = recommendation_admin_delete($id);
 
                 if ($errors === []) {
+                    admin_notification_mark_source_read('recommendation_submission', $id, (int) $admin['id']);
                     flash('success', 'Submission deleted.');
                     redirect(admin_recommendations_url());
                 }

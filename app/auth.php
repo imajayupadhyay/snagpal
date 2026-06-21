@@ -125,6 +125,11 @@ function admin_bookings_url(): string
     return url_path('sanchalak/bookings/');
 }
 
+function admin_notifications_url(): string
+{
+    return url_path('sanchalak/notifications/');
+}
+
 function admin_users_url(): string
 {
     return url_path('sanchalak/users/');

@@ -34,7 +34,10 @@ function recommendation_submit(array $post): array
         $errors[] = 'Your session expired. Please reopen the form and try again.';
     }
 
-    if (trim((string) ($post['website'] ?? '')) !== '') {
+    if (
+        trim((string) ($post['recommendation_reference'] ?? '')) !== ''
+        || trim((string) ($post['website'] ?? '')) !== ''
+    ) {
         $errors[] = 'Unable to submit this recommendation.';
     }
 
@@ -83,9 +86,21 @@ function recommendation_submit(array $post): array
             'email' => $email,
             'quote' => $quote,
         ]);
+        $submissionId = (int) db()->lastInsertId();
     } catch (Throwable) {
         return ['ok' => false, 'errors' => ['Unable to submit your recommendation right now. Please try again later.'], 'old' => $old];
     }
+
+    admin_notification_create([
+        'type' => 'recommendation_pending',
+        'severity' => 'info',
+        'title' => 'New recommendation submitted',
+        'body' => $name . ' submitted a recommendation for review.',
+        'action_label' => 'Review submission',
+        'action_url' => url_path('sanchalak/recommendations/'),
+        'source_type' => 'recommendation_submission',
+        'source_id' => $submissionId,
+    ]);
 
     return [
         'ok' => true,

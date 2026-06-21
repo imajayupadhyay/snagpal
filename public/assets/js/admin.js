@@ -84,6 +84,29 @@
 
   document.querySelectorAll('[data-rich-editor]').forEach(initRichEditor);
 
+  /* notification dropdown */
+  (function(){
+    var centers=[].slice.call(document.querySelectorAll('.notification-center'));
+
+    if(!centers.length){
+      return;
+    }
+
+    document.addEventListener('click',function(event){
+      centers.forEach(function(center){
+        if(!center.contains(event.target)){
+          center.removeAttribute('open');
+        }
+      });
+    });
+
+    document.addEventListener('keydown',function(event){
+      if(event.key==='Escape'){
+        centers.forEach(function(center){center.removeAttribute('open');});
+      }
+    });
+  })();
+
   /* mobile sidebar drawer */
   (function(){
     var sidebar=document.getElementById('adminSidebar');

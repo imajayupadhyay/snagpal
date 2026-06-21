@@ -1,13 +1,30 @@
-<?php $active = $active ?? ''; ?>
+<?php
+$active = $active ?? '';
+$notificationAdmin = function_exists('current_admin') ? current_admin() : null;
+$notificationAdminId = is_array($notificationAdmin) ? (int) ($notificationAdmin['id'] ?? 0) : 0;
+$adminNotificationUnreadCount = $notificationAdminId > 0 ? admin_notifications_unread_count($notificationAdminId) : 0;
+$adminNotifications = $notificationAdminId > 0 ? admin_notifications_recent($notificationAdminId) : [];
+?>
 <header class="admin-topbar">
   <button class="topbar-burger" type="button" data-sidebar-toggle aria-label="Toggle navigation" aria-controls="adminSidebar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
   </button>
   <a class="topbar-brand" href="<?= e(admin_dashboard_url()) ?>">SN <span>Admin</span></a>
+  <div class="topbar-spacer"></div>
+  <?php render('admin/partials/notifications', [
+      'notifications' => $adminNotifications,
+      'unreadCount' => $adminNotificationUnreadCount,
+  ]); ?>
 </header>
 
 <aside class="sidebar" id="adminSidebar">
-  <a href="<?= e(admin_dashboard_url()) ?>" class="sidebar-brand">SN <span>Admin</span></a>
+  <div class="sidebar-head">
+    <a href="<?= e(admin_dashboard_url()) ?>" class="sidebar-brand">SN <span>Admin</span></a>
+    <?php render('admin/partials/notifications', [
+        'notifications' => $adminNotifications,
+        'unreadCount' => $adminNotificationUnreadCount,
+    ]); ?>
+  </div>
   <nav class="sidebar-nav" aria-label="Admin navigation">
     <a class="nav-item<?= $active === 'dashboard' ? ' active' : '' ?>" href="<?= e(admin_dashboard_url()) ?>">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>

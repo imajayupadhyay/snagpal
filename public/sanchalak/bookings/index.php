@@ -18,16 +18,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             if ($action === 'confirm_booking') {
-                $errors = schedule_confirm_booking((int) ($_POST['booking_id'] ?? 0));
+                $bookingId = (int) ($_POST['booking_id'] ?? 0);
+                $errors = schedule_confirm_booking($bookingId);
 
                 if ($errors === []) {
+                    admin_notification_mark_source_read('meeting_booking', $bookingId, (int) $admin['id']);
                     flash('success', 'Booking confirmed.');
                     redirect(admin_bookings_url());
                 }
             } elseif ($action === 'cancel_booking') {
-                $errors = schedule_cancel_booking((int) ($_POST['booking_id'] ?? 0));
+                $bookingId = (int) ($_POST['booking_id'] ?? 0);
+                $errors = schedule_cancel_booking($bookingId);
 
                 if ($errors === []) {
+                    admin_notification_mark_source_read('meeting_booking', $bookingId, (int) $admin['id']);
                     flash('success', 'Booking cancelled.');
                     redirect(admin_bookings_url());
                 }

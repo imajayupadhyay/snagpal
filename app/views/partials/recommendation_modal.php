@@ -44,7 +44,7 @@ $autoOpen = $type !== '' || isset($_GET['recommendation']);
 
       <form class="meeting-form" id="recommendationForm" method="post" action="<?= e(url_path('give-recommendation/')) ?>">
         <?= public_csrf_field() ?>
-        <input class="hp-field" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input class="hp-field" type="text" name="recommendation_reference" tabindex="-1" autocomplete="new-password" aria-hidden="true">
 
         <div class="meeting-grid">
           <label class="full">

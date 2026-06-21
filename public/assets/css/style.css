@@ -382,7 +382,7 @@
   .about-closing{display:flex;justify-content:space-between;gap:clamp(2rem,5vw,5rem);align-items:flex-end;
     background:var(--accent-deep);color:#EAF1EE}
   .about-closing .mono{color:#9DC3BB}
-  .about-closing h2{margin-top:0.8rem;font-family:var(--grunge);font-size:clamp(3.5rem,11vw,8.5rem);line-height:0.82;color:#fff}
+  .about-closing h2{margin-top:0.8rem;font-family:var(--cond);font-weight:700;font-size:clamp(3.5rem,11vw,8.5rem);line-height:0.9;color:#fff}
   .about-closing p{margin-top:1.4rem;max-width:48ch;font-size:clamp(1rem,1.5vw,1.22rem);font-weight:300;line-height:1.62;
     color:#C9DAD5}
   .about-closing-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto}
@@ -667,7 +667,7 @@
   /* ---------- schedule (closing) ---------- */
   .schedule{background:var(--accent-deep);color:#EDF3F0;text-align:left}
   .schedule .mono{color:rgba(237,243,240,0.6)}
-  .schedule h2{font-family:var(--grunge);font-size:clamp(3.5rem,15vw,11rem);line-height:0.82;color:#fff;margin:1rem 0 0}
+  .schedule h2{font-family:var(--cond);font-weight:700;font-size:clamp(3.5rem,15vw,11rem);line-height:0.9;color:#fff;margin:1rem 0 0}
   .schedule .sub{margin-top:1.8rem;max-width:46ch;font-size:clamp(1.05rem,1.6vw,1.3rem);font-weight:300;color:#C9DAD5;line-height:1.55}
   .schedule .connect{display:inline-flex;align-items:center;gap:0.7rem;margin-top:2.4rem;
     font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.3rem,3vw,2.2rem);

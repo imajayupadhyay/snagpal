@@ -53,7 +53,7 @@ $slots = is_array($slots ?? null) ? $slots : [];
       <?php else: ?>
         <form class="meeting-form" method="post" action="<?= e(url_path('book-meeting/')) ?>">
           <?= public_csrf_field() ?>
-          <input class="hp-field" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <input class="hp-field" type="text" name="booking_reference" tabindex="-1" autocomplete="new-password" aria-hidden="true">
 
           <div class="meeting-grid">
             <label class="meeting-date-field">

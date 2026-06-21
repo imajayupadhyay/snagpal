@@ -112,7 +112,10 @@ function schedule_submit_booking(array $post): array
         $errors[] = 'Your session expired. Please reopen the booking form and try again.';
     }
 
-    if (trim((string) ($post['website'] ?? '')) !== '') {
+    if (
+        trim((string) ($post['booking_reference'] ?? '')) !== ''
+        || trim((string) ($post['website'] ?? '')) !== ''
+    ) {
         $errors[] = 'Unable to submit this booking request.';
     }
 
@@ -208,8 +211,23 @@ function schedule_submit_booking(array $post): array
             'visitor_phone' => $phone !== '' ? $phone : null,
             'message' => $message !== '' ? $message : null,
         ]);
+        $bookingId = (int) $pdo->lastInsertId();
 
         $pdo->commit();
+
+        admin_notification_create([
+            'type' => 'booking_pending',
+            'severity' => 'warning',
+            'title' => 'New meeting request',
+            'body' => $name . ' requested '
+                . schedule_format_date((string) $slot['slot_date'])
+                . ' at ' . schedule_format_slot_label((string) $slot['start_time'], (string) $slot['end_time'])
+                . ' and is waiting for confirmation.',
+            'action_label' => 'Open booking',
+            'action_url' => url_path('sanchalak/bookings/'),
+            'source_type' => 'meeting_booking',
+            'source_id' => $bookingId,
+        ]);
 
         try {
             notify_booking_requested([
