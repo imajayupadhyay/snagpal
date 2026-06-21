@@ -92,7 +92,6 @@ $standards = array_values($awardsPage['standards']);
   <section class="about-closing awards-closing">
     <div>
       <span class="mono"><?= e($awardsPage['schedule_eyebrow']) ?></span>
-      <h2><?= e($awardsPage['schedule_heading']) ?></h2>
       <p><?= e($awardsPage['schedule_description']) ?></p>
     </div>
     <div class="about-closing-actions">

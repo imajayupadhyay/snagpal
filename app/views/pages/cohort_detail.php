@@ -122,7 +122,6 @@ $takeaways = cohort_public_takeaways($cohort);
   <section class="about-closing cohorts-closing">
     <div>
       <span class="mono"><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></span>
-      <h2><?= e($schedule['heading'] ?? "Let's talk.") ?></h2>
       <p><?= e($schedule['description'] ?? '') ?></p>
     </div>
     <div class="about-closing-actions">

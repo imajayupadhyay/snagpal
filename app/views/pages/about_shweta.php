@@ -186,7 +186,6 @@ $profileParagraphs = array_values($aboutPage['profile_paragraphs_html']);
   <section class="about-closing">
     <div>
       <span class="mono"><?= e($aboutPage['schedule_eyebrow']) ?></span>
-      <h2><?= e($aboutPage['schedule_heading']) ?></h2>
       <p><?= e($aboutPage['schedule_description']) ?></p>
     </div>
     <div class="about-closing-actions">

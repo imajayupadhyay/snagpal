@@ -112,7 +112,6 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
   <section class="about-closing events-closing">
     <div>
       <span class="mono"><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></span>
-      <h2><?= e($schedule['heading'] ?? "Let's talk.") ?></h2>
       <p><?= e($schedule['description'] ?? '') ?></p>
     </div>
     <div class="about-closing-actions">

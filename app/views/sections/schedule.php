@@ -6,7 +6,6 @@ $mailto = 'mailto:' . $email . '?subject=' . rawurlencode($schedule['email_subje
 ?>
 <section id="schedule" class="schedule">
   <div class="head" style="margin-bottom:0"><span class="mono"><?= e($schedule['eyebrow']) ?></span></div>
-  <h2 class="grunge"><?= e($schedule['heading']) ?></h2>
   <p class="sub reveal d1"><?= e($schedule['description']) ?></p>
   <a class="connect" href="<?= e($mailto) ?>"><?= e($email) ?> &rarr;</a>
   <div class="row reveal d2">
