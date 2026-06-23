@@ -362,6 +362,65 @@ function upload_awards_image(string $fieldName, string $currentPath, array &$err
     return 'uploads/awards/' . $filename;
 }
 
+function upload_seo_image(string $fieldName, string $currentPath, array &$errors): string
+{
+    if (empty($_FILES[$fieldName]) || ! is_array($_FILES[$fieldName])) {
+        return $currentPath;
+    }
+
+    $file = $_FILES[$fieldName];
+
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return $currentPath;
+    }
+
+    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        $errors[] = 'One of the image uploads failed. Please try again.';
+        return $currentPath;
+    }
+
+    $tmpName = (string) ($file['tmp_name'] ?? '');
+
+    if ($tmpName === '' || ! is_uploaded_file($tmpName)) {
+        $errors[] = 'Invalid image upload.';
+        return $currentPath;
+    }
+
+    if ((int) ($file['size'] ?? 0) > 5 * 1024 * 1024) {
+        $errors[] = 'Images must be 5 MB or smaller.';
+        return $currentPath;
+    }
+
+    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($tmpName);
+    $extensions = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+
+    if (! isset($extensions[$mime])) {
+        $errors[] = 'Only JPG, PNG, and WebP images are allowed.';
+        return $currentPath;
+    }
+
+    $directory = PUBLIC_PATH . '/uploads/seo';
+
+    if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+        $errors[] = 'Unable to create the SEO upload directory.';
+        return $currentPath;
+    }
+
+    $filename = date('YmdHis') . '-' . bin2hex(random_bytes(6)) . '.' . $extensions[$mime];
+    $target = $directory . '/' . $filename;
+
+    if (! move_uploaded_file($tmpName, $target)) {
+        $errors[] = 'Unable to store the uploaded image.';
+        return $currentPath;
+    }
+
+    return 'uploads/seo/' . $filename;
+}
+
 function upload_event_poster(string $fieldName, string $currentPath, array &$errors): string
 {
     if (empty($_FILES[$fieldName]) || ! is_array($_FILES[$fieldName])) {

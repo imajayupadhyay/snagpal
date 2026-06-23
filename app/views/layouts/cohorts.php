@@ -6,22 +6,7 @@ $contentView = (string) ($contentView ?? 'pages/cohorts_index');
 <!DOCTYPE html>
 <html lang="<?= e($page['lang'] ?? 'en') ?>">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><?= e($page['title']) ?></title>
-<meta name="description" content="<?= e($page['description']) ?>" />
-<meta name="theme-color" content="<?= e($page['theme_color'] ?? '#0C5E55') ?>" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Roboto+Condensed:wght@400;500;700&family=Roboto+Mono:wght@400;500&family=Rubik+Distressed&display=swap" rel="stylesheet">
-<link rel="icon" href="<?= e(asset('images/favicon.svg')) ?>" type="image/svg+xml">
-<link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">
-<script>
-  (function(){try{
-    var saved=localStorage.getItem('theme');
-    document.documentElement.setAttribute('data-theme',saved==='dark'?'dark':'light');
-  }catch(e){document.documentElement.setAttribute('data-theme','light');}})();
-</script>
+<?php render('partials/head', ['site' => $site, 'page' => $page]); ?>
 </head>
 <body class="cohorts-page">
 <?php render('partials/nav', ['site' => $site, 'currentPage' => 'cohorts']); ?>

@@ -74,6 +74,10 @@ $adminNotifications = $notificationAdminId > 0 ? admin_notifications_recent($not
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v11H14l-2 3-2-3H3z"/><path d="M8 9h8M8 12.5h5"/></svg>
       <span>Bookings</span>
     </a>
+    <a class="nav-item<?= $active === 'seo' ? ' active' : '' ?>" href="<?= e(admin_seo_url()) ?>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <span>SEO &amp; Settings</span>
+    </a>
     <a class="nav-item<?= $active === 'users' ? ' active' : '' ?>" href="<?= e(admin_users_url()) ?>">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 13.4A5.5 5.5 0 0 1 20.5 18"/></svg>
       <span>Users</span>

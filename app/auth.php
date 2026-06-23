@@ -135,6 +135,11 @@ function admin_users_url(): string
     return url_path('sanchalak/users/');
 }
 
+function admin_seo_url(): string
+{
+    return url_path('sanchalak/seo/');
+}
+
 function current_admin(): ?array
 {
     start_admin_session();

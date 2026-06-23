@@ -10,6 +10,11 @@ $site['cohorts_page'] = cohorts_page_content();
 $page = $site['page'];
 $page['title'] = 'Cohorts - Shweta Nagpal';
 $page['description'] = 'Cohort recordings, notes, and capability-building sessions on AI governance, public-sector technology, procurement, and critical infrastructure.';
+$page['canonical'] = '/cohorts/';
+$page['og_type'] = 'website';
+$page['og_title'] = '';
+$page['og_description'] = '';
+$page['og_image'] = '';
 
 render('layouts/cohorts', [
     'site' => $site,

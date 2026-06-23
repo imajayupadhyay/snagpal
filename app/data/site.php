@@ -8,6 +8,10 @@ return [
         'title' => 'Shweta Nagpal - AI Governance & Public-Sector Technology',
         'description' => 'Shweta Nagpal, Nodal Officer for AI Governance at the Bhakra Beas Management Board, Ministry of Power, Government of India. Bringing governance discipline to critical public technology.',
         'theme_color' => '#0C5E55',
+        'og_type' => 'profile',
+        'og_title' => '',
+        'og_description' => '',
+        'og_image' => '',
     ],
     'identity' => [
         'first_name' => 'Shweta',

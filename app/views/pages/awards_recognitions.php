@@ -23,7 +23,7 @@ $standards = array_values($awardsPage['standards']);
 
       <aside class="awards-hero-card reveal d2" aria-label="Recognition summary">
         <div class="awards-hero-image">
-          <img src="<?= e(asset($awardsPage['hero_card_image_src'] ?: 'images/research-felicitation.jpg')) ?>" alt="<?= e($awardsPage['hero_card_image_alt'] ?: $identity['full_name']) ?>" />
+          <img src="<?= e(asset($awardsPage['hero_card_image_src'] ?: 'images/research-felicitation.jpg')) ?>" alt="<?= e($awardsPage['hero_card_image_alt'] ?: $identity['full_name']) ?>" fetchpriority="high" decoding="async" />
         </div>
         <div class="awards-hero-meta">
           <span class="mono"><?= e($awardsPage['hero_card_eyebrow']) ?></span>

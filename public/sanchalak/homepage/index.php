@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Your session expired. Please try again.';
     } else {
         $content = homepage_content_from_post($_POST, $content);
+        $content['page']['og_image'] = upload_homepage_image('og_image_upload', (string) ($content['page']['og_image'] ?? ''), $errors);
         $content['hero']['image']['src'] = upload_homepage_image('hero_image_upload', $content['hero']['image']['src'], $errors);
         $content['profile']['image']['src'] = upload_homepage_image('profile_image_upload', $content['profile']['image']['src'], $errors);
 

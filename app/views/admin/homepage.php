@@ -82,6 +82,31 @@ ob_start();
             <label for="page_description">Meta description</label>
             <textarea id="page_description" name="page[description]" rows="3"><?= e($content['page']['description'] ?? '') ?></textarea>
           </div>
+          <div class="field">
+            <label for="page_og_title">Share title (OG)</label>
+            <input id="page_og_title" name="page[og_title]" value="<?= e($content['page']['og_title'] ?? '') ?>" placeholder="Falls back to the page title">
+          </div>
+          <div class="field small">
+            <label for="page_og_type">OG type</label>
+            <select id="page_og_type" name="page[og_type]">
+              <?php foreach (['profile', 'website', 'article'] as $type): ?>
+                <option value="<?= e($type) ?>"<?= ($content['page']['og_type'] ?? 'profile') === $type ? ' selected' : '' ?>><?= e($type) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="page_og_description">Share description (OG)</label>
+            <textarea id="page_og_description" name="page[og_description]" rows="2" placeholder="Falls back to the meta description"><?= e($content['page']['og_description'] ?? '') ?></textarea>
+          </div>
+          <div class="field full">
+            <label for="og_image_upload">Share image (1200×630)</label>
+            <?php if (trim((string) ($content['page']['og_image'] ?? '')) !== ''): ?>
+              <div class="image-preview"><img src="<?= e(asset($content['page']['og_image'])) ?>" alt="Current share image" loading="lazy"></div>
+            <?php endif; ?>
+            <input type="file" id="og_image_upload" name="og_image_upload" accept="image/png,image/jpeg,image/webp">
+            <input type="hidden" name="page[og_image]" value="<?= e($content['page']['og_image'] ?? '') ?>">
+            <p class="hint">Overrides the global default share image for the homepage only. Leave empty to use the global default from <strong>SEO &amp; Settings</strong>.</p>
+          </div>
         </div>
       </section>
 

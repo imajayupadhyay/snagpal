@@ -11,7 +11,7 @@
       <p class="lede reveal d3"><?= e($hero['lede']) ?></p>
     </div>
     <div class="hero-img reveal d2" id="heroImg">
-      <img src="<?= e(asset($hero['image']['src'])) ?>" alt="<?= e($hero['image']['alt']) ?>" />
+      <img src="<?= e(asset($hero['image']['src'])) ?>" alt="<?= e($hero['image']['alt']) ?>" width="1200" height="900" fetchpriority="high" decoding="async" />
     </div>
   </div>
   <div class="hero-meta reveal d4">

@@ -1,0 +1,17 @@
+{
+  "name": "Shweta Nagpal",
+  "short_name": "Shweta Nagpal",
+  "description": "Shweta Nagpal — AI Governance & Public-Sector Technology.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0C5E55",
+  "icons": [
+    {
+      "src": "/assets/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

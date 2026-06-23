@@ -9,6 +9,11 @@ $site['events_page'] = events_page_content();
 $page = $site['page'];
 $page['title'] = 'Upcoming & Past Events - Shweta Nagpal';
 $page['description'] = 'Upcoming and past events featuring talks, workshops, and public-sector technology engagements by Shweta Nagpal.';
+$page['canonical'] = '/events/';
+$page['og_type'] = 'website';
+$page['og_title'] = '';
+$page['og_description'] = '';
+$page['og_image'] = '';
 
 render('layouts/events', [
     'site' => $site,

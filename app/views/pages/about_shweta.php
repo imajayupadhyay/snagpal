@@ -28,7 +28,7 @@ $profileParagraphs = array_values($aboutPage['profile_paragraphs_html']);
 
       <aside class="about-identity-panel reveal d2" aria-label="Profile summary">
         <div class="about-portrait">
-          <img src="<?= e(asset($aboutPage['portrait_src'] ?: 'images/profile-commemoration.jpg')) ?>" alt="<?= e($aboutPage['portrait_alt'] ?: $identity['full_name']) ?>" />
+          <img src="<?= e(asset($aboutPage['portrait_src'] ?: 'images/profile-commemoration.jpg')) ?>" alt="<?= e($aboutPage['portrait_alt'] ?: $identity['full_name']) ?>" fetchpriority="high" decoding="async" />
         </div>
         <div class="about-panel-body">
           <span class="mono"><?= e($aboutPage['mandate_eyebrow']) ?></span>

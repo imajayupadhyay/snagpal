@@ -17,6 +17,17 @@ if ($cohort === null) {
 $page = $site['page'];
 $page['title'] = ($cohort['title'] ?? 'Cohort') . ' - Shweta Nagpal Cohorts';
 $page['description'] = $cohort['description'] ?? 'Cohort detail from Shweta Nagpal on AI governance and public-sector technology.';
+$page['og_type'] = 'article';
+$page['og_title'] = '';
+$page['og_description'] = '';
+$page['og_image'] = (string) ($cohort['poster'] ?? '');
+
+if ($cohort === null) {
+    $page['robots'] = 'noindex, follow';
+    $page['canonical'] = '/cohorts/';
+} else {
+    $page['canonical'] = '/cohorts/detail/?slug=' . rawurlencode((string) ($cohort['slug'] ?? $requestedSlug));
+}
 
 render('layouts/cohorts', [
     'site' => $site,

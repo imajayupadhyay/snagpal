@@ -21,6 +21,7 @@ require APP_PATH . '/helpers.php';
 require APP_PATH . '/database.php';
 require APP_PATH . '/mailer.php';
 require APP_PATH . '/notifications.php';
+require APP_PATH . '/seo.php';
 require APP_PATH . '/homepage.php';
 require APP_PATH . '/cohorts.php';
 require APP_PATH . '/cohort_categories.php';

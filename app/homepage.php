@@ -117,6 +117,10 @@ function homepage_content_from_post(array $post, array $current): array
             'title' => homepage_text($post['page']['title'] ?? ''),
             'description' => homepage_textarea($post['page']['description'] ?? ''),
             'theme_color' => homepage_text($post['page']['theme_color'] ?? '#0C5E55'),
+            'og_type' => homepage_text($post['page']['og_type'] ?? 'profile'),
+            'og_title' => homepage_text($post['page']['og_title'] ?? ''),
+            'og_description' => homepage_textarea($post['page']['og_description'] ?? ''),
+            'og_image' => homepage_text($post['page']['og_image'] ?? ($current['page']['og_image'] ?? '')),
         ],
         'identity' => [
             'first_name' => homepage_text($post['identity']['first_name'] ?? ''),
