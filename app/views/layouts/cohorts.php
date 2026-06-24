@@ -13,6 +13,7 @@ $contentView = (string) ($contentView ?? 'pages/cohorts_index');
 
 <?php render($contentView, [
     'site' => $site,
+    'page' => $page,
     'cohort' => $cohort ?? null,
     'cohortItems' => $cohortItems ?? null,
 ]); ?>

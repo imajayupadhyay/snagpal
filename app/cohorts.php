@@ -24,6 +24,8 @@ function cohort_admin_default(): array
         'is_featured' => 0,
         'sort_order' => 0,
         'published_at' => '',
+        'created_at' => '',
+        'updated_at' => '',
     ];
 }
 
@@ -139,6 +141,8 @@ function cohort_admin_normalize(array $cohort): array
         'is_featured' => ! empty($cohort['is_featured']) ? 1 : 0,
         'sort_order' => (int) ($cohort['sort_order'] ?? 0),
         'published_at' => cohort_admin_datetime_value($cohort['published_at'] ?? ''),
+        'created_at' => cohort_admin_datetime_value($cohort['created_at'] ?? ''),
+        'updated_at' => cohort_admin_datetime_value($cohort['updated_at'] ?? ''),
     ]);
 }
 
@@ -425,6 +429,21 @@ function cohort_admin_datetime_is_valid(string $value): bool
     }
 }
 
+function cohort_public_date_label(mixed $value): string
+{
+    $value = trim(str_replace('T', ' ', (string) $value));
+
+    if ($value === '') {
+        return '';
+    }
+
+    try {
+        return (new DateTimeImmutable($value))->format('F j, Y');
+    } catch (Throwable) {
+        return '';
+    }
+}
+
 function cohort_public_archive(array $fallbackCohorts): array
 {
     $archive = [
@@ -473,6 +492,8 @@ function cohort_public_from_row(array $row): array
         'resource_url' => $cohort['resource_url'],
         'takeaways' => cohort_public_takeaways($cohort),
         'published_at' => $cohort['published_at'],
+        'created_at' => $cohort['created_at'],
+        'updated_at' => $cohort['updated_at'],
         'is_featured' => (int) $cohort['is_featured'],
     ];
 }

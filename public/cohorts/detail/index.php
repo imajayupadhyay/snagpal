@@ -27,6 +27,28 @@ if ($cohort === null) {
     $page['canonical'] = '/cohorts/';
 } else {
     $page['canonical'] = '/cohorts/detail/?slug=' . rawurlencode((string) ($cohort['slug'] ?? $requestedSlug));
+    $seo = seo_settings();
+    $person = is_array($seo['person'] ?? null) ? $seo['person'] : [];
+    $page['author_name'] = seo_text($person['name'] ?? '');
+    if ($page['author_name'] === '') {
+        $page['author_name'] = seo_text($seo['site_name'] ?? 'Shweta Nagpal');
+    }
+    $page['author_url'] = seo_canonical_url($seo, '/about-shweta/');
+    $articleDates = seo_article_dates(
+        $cohort['published_at'] ?? ($cohort['created_at'] ?? ''),
+        $cohort['updated_at'] ?? ($cohort['published_at'] ?? ($cohort['created_at'] ?? ''))
+    );
+    $page['published_at'] = $articleDates['published'];
+    $page['updated_at'] = $articleDates['modified'];
+    $page['article_section'] = (string) ($cohort['category_name'] ?? '');
+    $page['schemas'] = [
+        seo_cohort_blog_posting_schema($seo, $cohort, $page['canonical']),
+        seo_breadcrumb_schema($seo, [
+            ['name' => 'Home', 'path' => '/'],
+            ['name' => 'Cohorts', 'path' => '/cohorts/'],
+            ['name' => (string) ($cohort['title'] ?? 'Cohort'), 'path' => $page['canonical']],
+        ]),
+    ];
 }
 
 render('layouts/cohorts', [

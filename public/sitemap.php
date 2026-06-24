@@ -6,7 +6,7 @@ require dirname(__DIR__) . '/app/bootstrap.php';
 
 $seo = seo_settings();
 $urls = seo_sitemap_urls($seo);
-$lastmod = date('Y-m-d');
+$defaultLastmod = date('Y-m-d');
 
 header('Content-Type: application/xml; charset=UTF-8');
 
@@ -14,6 +14,12 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
 foreach ($urls as $url) {
+    $lastmod = trim((string) ($url['lastmod'] ?? ''));
+
+    if ($lastmod === '') {
+        $lastmod = $defaultLastmod;
+    }
+
     echo "  <url>\n";
     echo '    <loc>' . e($url['loc']) . "</loc>\n";
     echo '    <lastmod>' . e($lastmod) . "</lastmod>\n";

@@ -4,7 +4,7 @@
  *
  * Reads the per-page `$page` array (title, description, theme_color, plus
  * optional SEO overrides: robots, canonical, og_type, og_title,
- * og_description, og_image, og_image_alt) and layers it over the global
+ * og_description, og_image, og_image_alt, schemas) and layers it over the global
  * `seo_settings()` defaults to emit canonical, Open Graph, Twitter,
  * verification, icons, JSON-LD (Person + WebSite), and analytics.
  */
@@ -32,6 +32,10 @@ foreach ([$seo['default_og_image'] ?? '', $seo['person']['image'] ?? '', $site['
 }
 $ogImage = seo_absolute_url($seo, $ogImageRaw);
 $ogImageAlt = trim((string) ($page['og_image_alt'] ?? '')) !== '' ? (string) $page['og_image_alt'] : $ogTitle;
+$articlePublishedTime = seo_datetime_iso8601($page['published_at'] ?? '');
+$articleModifiedTime = seo_datetime_iso8601($page['updated_at'] ?? '');
+$articleAuthorUrl = trim((string) ($page['author_url'] ?? ''));
+$articleSection = trim((string) ($page['article_section'] ?? ''));
 
 $siteName = (string) ($seo['site_name'] ?? 'Shweta Nagpal');
 $locale = (string) ($seo['locale'] ?? 'en_US');
@@ -42,7 +46,15 @@ $analyticsId = trim((string) ($seo['analytics_id'] ?? ''));
 
 $personSchema = seo_person_schema($seo);
 $websiteSchema = seo_website_schema($seo);
-$jsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP;
+$pageSchemas = array_values(array_filter(
+    is_array($page['schemas'] ?? null) ? $page['schemas'] : [],
+    static fn (mixed $schema): bool => is_array($schema) && $schema !== []
+));
+$jsonFlags = JSON_UNESCAPED_SLASHES
+    | JSON_UNESCAPED_UNICODE
+    | JSON_HEX_TAG
+    | JSON_HEX_AMP
+    | JSON_INVALID_UTF8_SUBSTITUTE;
 ?>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -71,6 +83,18 @@ $jsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JS
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <?php endif; ?>
+<?php if ($ogType === 'article' && $articlePublishedTime !== ''): ?>
+<meta property="article:published_time" content="<?= e($articlePublishedTime) ?>" />
+<?php endif; ?>
+<?php if ($ogType === 'article' && $articleModifiedTime !== ''): ?>
+<meta property="article:modified_time" content="<?= e($articleModifiedTime) ?>" />
+<?php endif; ?>
+<?php if ($ogType === 'article' && $articleAuthorUrl !== ''): ?>
+<meta property="article:author" content="<?= e($articleAuthorUrl) ?>" />
+<?php endif; ?>
+<?php if ($ogType === 'article' && $articleSection !== ''): ?>
+<meta property="article:section" content="<?= e($articleSection) ?>" />
+<?php endif; ?>
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image" />
@@ -97,6 +121,9 @@ $jsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JS
 <?php if ($personSchema !== []): ?>
 <script type="application/ld+json"><?= json_encode($personSchema, $jsonFlags) ?></script>
 <?php endif; ?>
+<?php foreach ($pageSchemas as $schema): ?>
+<script type="application/ld+json"><?= json_encode($schema, $jsonFlags) ?></script>
+<?php endforeach; ?>
 <?php if ($analyticsId !== '' && str_starts_with($analyticsId, 'GTM-')): ?>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','<?= e($analyticsId) ?>');</script>

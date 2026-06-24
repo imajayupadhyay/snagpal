@@ -321,8 +321,9 @@ function seo_person_schema(array $seo): array
     $schema = [
         '@context' => 'https://schema.org',
         '@type' => 'Person',
+        '@id' => seo_canonical_url($seo, '/about-shweta/') . '#person',
         'name' => (string) $person['name'],
-        'url' => seo_canonical_url($seo, '/'),
+        'url' => seo_canonical_url($seo, '/about-shweta/'),
     ];
 
     if (($person['job_title'] ?? '') !== '') {
@@ -404,14 +405,182 @@ function seo_website_schema(array $seo): array
     return [
         '@context' => 'https://schema.org',
         '@type' => 'WebSite',
+        '@id' => seo_canonical_url($seo, '/') . '#website',
         'name' => (string) ($seo['site_name'] ?? 'Shweta Nagpal'),
         'url' => seo_canonical_url($seo, '/'),
     ];
 }
 
 /**
+ * Convert a stored date/time value to ISO 8601 with timezone information.
+ * Invalid or empty values are omitted from structured data rather than
+ * breaking the page response.
+ */
+function seo_datetime_iso8601(mixed $value): string
+{
+    $value = trim(str_replace('T', ' ', (string) $value));
+
+    if ($value === '') {
+        return '';
+    }
+
+    try {
+        return (new DateTimeImmutable($value))->format(DATE_ATOM);
+    } catch (Throwable) {
+        return '';
+    }
+}
+
+/**
+ * Return consistent publication/modification dates, ensuring modification is
+ * never earlier than publication.
+ *
+ * @return array{published: string, modified: string}
+ */
+function seo_article_dates(mixed $published, mixed $modified): array
+{
+    $publishedIso = seo_datetime_iso8601($published);
+    $modifiedIso = seo_datetime_iso8601($modified);
+
+    if ($publishedIso !== '') {
+        if ($modifiedIso === '') {
+            $modifiedIso = $publishedIso;
+        } else {
+            try {
+                if (new DateTimeImmutable($modifiedIso) < new DateTimeImmutable($publishedIso)) {
+                    $modifiedIso = $publishedIso;
+                }
+            } catch (Throwable) {
+                $modifiedIso = $publishedIso;
+            }
+        }
+    }
+
+    return [
+        'published' => $publishedIso,
+        'modified' => $modifiedIso,
+    ];
+}
+
+/**
+ * Build BlogPosting structured data for a published cohort detail page.
+ */
+function seo_cohort_blog_posting_schema(array $seo, array $cohort, string $canonicalPath): array
+{
+    $headline = seo_text($cohort['title'] ?? '');
+
+    if ($headline === '') {
+        return [];
+    }
+
+    $url = seo_canonical_url($seo, $canonicalPath);
+    $person = is_array($seo['person'] ?? null) ? $seo['person'] : [];
+    $authorName = seo_text($person['name'] ?? '');
+
+    if ($authorName === '') {
+        $authorName = seo_text($seo['site_name'] ?? 'Shweta Nagpal');
+    }
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BlogPosting',
+        'headline' => $headline,
+        'url' => $url,
+        'mainEntityOfPage' => [
+            '@type' => 'WebPage',
+            '@id' => $url,
+        ],
+        'isPartOf' => [
+            '@type' => 'Blog',
+            '@id' => seo_canonical_url($seo, '/cohorts/') . '#blog',
+            'name' => 'Cohorts',
+            'url' => seo_canonical_url($seo, '/cohorts/'),
+        ],
+        'author' => [
+            '@type' => 'Person',
+            '@id' => seo_canonical_url($seo, '/about-shweta/') . '#person',
+            'name' => $authorName,
+            'url' => seo_canonical_url($seo, '/about-shweta/'),
+        ],
+    ];
+
+    $description = seo_textarea($cohort['description'] ?? ($cohort['excerpt'] ?? ''));
+    if ($description !== '') {
+        $schema['description'] = $description;
+    }
+
+    $image = seo_absolute_url($seo, (string) ($cohort['poster'] ?? ''));
+    if ($image !== '') {
+        $schema['image'] = [$image];
+    }
+
+    $dates = seo_article_dates(
+        $cohort['published_at'] ?? ($cohort['created_at'] ?? ''),
+        $cohort['updated_at'] ?? ($cohort['published_at'] ?? ($cohort['created_at'] ?? ''))
+    );
+    if ($dates['published'] !== '') {
+        $schema['datePublished'] = $dates['published'];
+    }
+
+    if ($dates['modified'] !== '') {
+        $schema['dateModified'] = $dates['modified'];
+    }
+
+    $articleSection = seo_text($cohort['category_name'] ?? '');
+    if ($articleSection !== '') {
+        $schema['articleSection'] = $articleSection;
+    }
+
+    $locale = seo_text($seo['locale'] ?? '');
+    if ($locale !== '') {
+        $schema['inLanguage'] = str_replace('_', '-', $locale);
+    }
+
+    return $schema;
+}
+
+/**
+ * Build BreadcrumbList structured data from label/path pairs.
+ */
+function seo_breadcrumb_schema(array $seo, array $items): array
+{
+    $elements = [];
+
+    foreach ($items as $item) {
+        if (! is_array($item)) {
+            continue;
+        }
+
+        $name = seo_text($item['name'] ?? '');
+        $path = trim((string) ($item['path'] ?? ''));
+
+        if ($name === '' || $path === '') {
+            continue;
+        }
+
+        $elements[] = [
+            '@type' => 'ListItem',
+            'position' => count($elements) + 1,
+            'name' => $name,
+            'item' => seo_canonical_url($seo, $path),
+        ];
+    }
+
+    if (count($elements) < 2) {
+        return [];
+    }
+
+    return [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => $elements,
+    ];
+}
+
+/**
  * Public, indexable URLs for the sitemap. Returns a list of
- * ['loc' => absolute-url, 'priority' => '0.8', 'changefreq' => 'monthly'].
+ * ['loc' => absolute-url, 'priority' => '0.8', 'changefreq' => 'monthly',
+ *  'lastmod' => 'YYYY-MM-DD'].
  */
 function seo_sitemap_urls(array $seo): array
 {
@@ -433,10 +602,16 @@ function seo_sitemap_urls(array $seo): array
                 $slug = (string) ($cohort['slug'] ?? '');
 
                 if ($slug !== '') {
+                    $dates = seo_article_dates(
+                        $cohort['published_at'] ?? ($cohort['created_at'] ?? ''),
+                        $cohort['updated_at'] ?? ($cohort['published_at'] ?? ($cohort['created_at'] ?? ''))
+                    );
+
                     $urls[] = [
                         'path' => '/cohorts/detail/?slug=' . rawurlencode($slug),
                         'priority' => '0.5',
                         'changefreq' => 'monthly',
+                        'lastmod' => $dates['modified'] !== '' ? substr($dates['modified'], 0, 10) : '',
                     ];
                 }
             }
@@ -451,6 +626,7 @@ function seo_sitemap_urls(array $seo): array
             'loc' => seo_canonical_url($seo, $url['path']),
             'priority' => $url['priority'],
             'changefreq' => $url['changefreq'],
+            'lastmod' => (string) ($url['lastmod'] ?? ''),
         ];
     }
 

@@ -23,6 +23,12 @@ $related = array_values(array_filter($items, static fn (array $item): bool => ($
 $related = array_slice($related, 0, 3);
 $articleHtml = cohort_public_content_html($cohort['content'] ?? '', $cohort['description'] ?? '');
 $takeaways = cohort_public_takeaways($cohort);
+$publishedIso = seo_datetime_iso8601($page['published_at'] ?? '');
+$publishedLabel = cohort_public_date_label($page['published_at'] ?? '');
+$updatedIso = seo_datetime_iso8601($page['updated_at'] ?? '');
+$updatedLabel = cohort_public_date_label($page['updated_at'] ?? '');
+$authorName = trim((string) ($page['author_name'] ?? 'Shweta Nagpal'));
+$authorUrl = trim((string) ($page['author_url'] ?? ''));
 ?>
 <main class="cohorts-main">
   <header class="cohort-detail-hero" id="top">
@@ -55,6 +61,30 @@ $takeaways = cohort_public_takeaways($cohort);
             <dt>Format</dt>
             <dd>Video + field notes</dd>
           </div>
+          <?php if ($publishedLabel !== ''): ?>
+          <div>
+            <dt>Published</dt>
+            <dd><time datetime="<?= e($publishedIso) ?>"><?= e($publishedLabel) ?></time></dd>
+          </div>
+          <?php endif; ?>
+          <?php if ($updatedLabel !== '' && $updatedLabel !== $publishedLabel): ?>
+          <div>
+            <dt>Updated</dt>
+            <dd><time datetime="<?= e($updatedIso) ?>"><?= e($updatedLabel) ?></time></dd>
+          </div>
+          <?php endif; ?>
+          <?php if ($authorName !== ''): ?>
+          <div>
+            <dt>Author</dt>
+            <dd>
+              <?php if ($authorUrl !== ''): ?>
+                <a href="<?= e($authorUrl) ?>"><?= e($authorName) ?></a>
+              <?php else: ?>
+                <?= e($authorName) ?>
+              <?php endif; ?>
+            </dd>
+          </div>
+          <?php endif; ?>
           <div>
             <dt>Focus</dt>
             <dd>AI governance and public-sector technology</dd>
