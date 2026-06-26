@@ -762,6 +762,8 @@
     justify-content:space-between;gap:1rem;flex-wrap:wrap;font-family:var(--mono);font-size:0.62rem;
     letter-spacing:0.1em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,0.1)}
   footer a:hover{color:#fff}
+  footer .footer-sitemap{margin-left:auto;opacity:0.7}
+  footer .footer-sitemap a{text-transform:none;letter-spacing:0.04em}
 
   /* ---------- responsive ---------- */
   @media(max-width:820px){
