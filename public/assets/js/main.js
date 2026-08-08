@@ -544,8 +544,11 @@
     update();
   })();
 
-  /* cohort/event video posters: fall back when a thumbnail is missing, load the player on click */
-  (function(){
+})();
+
+/* cohort/event video posters: fall back when a thumbnail is missing, load the player on click.
+   Kept outside the main IIFE so a failure anywhere else can never stop videos from playing. */
+(function(){
     document.querySelectorAll('.cohort-poster[data-poster-fallback]').forEach(function(img){
       img.addEventListener('error',function(){
         var next=img.getAttribute('data-poster-fallback');
@@ -583,5 +586,4 @@
       button.parentNode.replaceChild(player,button);
       if(type==='video'){var played=player.play();if(played&&played.catch)played.catch(function(){});}
     });
-  })();
 })();
