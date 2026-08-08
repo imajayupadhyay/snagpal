@@ -314,7 +314,9 @@ ob_start();
           <div class="field full"><label>Heading</label><input name="cohorts[heading]" value="<?= e($content['cohorts']['heading'] ?? '') ?>"></div>
           <div class="field full"><label>Intro</label><textarea name="cohorts[intro]" rows="2"><?= e($content['cohorts']['intro'] ?? '') ?></textarea></div>
         </div>
-        <h3>Cohort cards</h3>
+        <p class="hint">The cards in this section are published automatically from the <a href="<?= e(admin_cohorts_url()) ?>">Cohorts</a> module &mdash; the homepage shows the featured cohort first, then the newest published ones, up to <?= e((string) cohort_home_limit()) ?> in total, with a &ldquo;View all cohorts&rdquo; link to <code>/cohorts/</code>. The heading, intro, and note above are still edited here.</p>
+        <h3>Fallback cohort cards</h3>
+        <p class="hint">These rows are only used while no cohort has been published yet. Once the Cohorts module has a published entry, these rows are ignored.</p>
         <div class="repeat-list">
           <?php foreach ($rows($content['cohorts']['items'] ?? [], 1) as $index => $item): ?>
             <div class="repeat-row cohort-row">

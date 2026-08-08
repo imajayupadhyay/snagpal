@@ -543,4 +543,45 @@
     window.addEventListener('resize',update);
     update();
   })();
+
+  /* cohort/event video posters: fall back when a thumbnail is missing, load the player on click */
+  (function(){
+    document.querySelectorAll('.cohort-poster[data-poster-fallback]').forEach(function(img){
+      img.addEventListener('error',function(){
+        var next=img.getAttribute('data-poster-fallback');
+        img.removeAttribute('data-poster-fallback');
+        if(next) img.src=next;
+      });
+    });
+
+    document.addEventListener('click',function(event){
+      var button=event.target.closest('[data-cohort-play]');
+      if(!button) return;
+      var type=button.getAttribute('data-embed-type');
+      var src=button.getAttribute('data-embed-src');
+      if(!src) return;
+      var title=button.getAttribute('data-embed-title')||'Video';
+      var poster=button.getAttribute('data-embed-poster')||'';
+      var player;
+      if(type==='video'){
+        player=document.createElement('video');
+        player.className='cohort-video';
+        player.controls=true;player.autoplay=true;player.playsInline=true;
+        if(poster) player.poster=poster;
+        var source=document.createElement('source');
+        source.src=src;
+        player.appendChild(source);
+      }else{
+        player=document.createElement('iframe');
+        player.className='cohort-frame';
+        player.src=src;
+        player.title=title;
+        player.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+        player.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        player.setAttribute('allowfullscreen','');
+      }
+      button.parentNode.replaceChild(player,button);
+      if(type==='video'){var played=player.play();if(played&&played.catch)played.catch(function(){});}
+    });
+  })();
 })();

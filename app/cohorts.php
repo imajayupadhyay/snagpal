@@ -444,6 +444,37 @@ function cohort_public_date_label(mixed $value): string
     }
 }
 
+/**
+ * How many published cohorts the homepage "Recent Cohorts" section shows.
+ */
+function cohort_home_limit(): int
+{
+    return 10;
+}
+
+/**
+ * Fetch published cohort rows. $orderBy is an internal literal, never user input.
+ */
+function cohort_public_rows(string $orderBy, ?int $limit = null): array
+{
+    $sql = 'SELECT * FROM cohorts WHERE status = "published" ORDER BY ' . $orderBy;
+
+    if ($limit !== null && $limit > 0) {
+        $sql .= ' LIMIT ' . $limit;
+    }
+
+    return db()->query($sql)->fetchAll();
+}
+
+function cohort_public_published_count(): int
+{
+    try {
+        return (int) db()->query('SELECT COUNT(*) FROM cohorts WHERE status = "published"')->fetchColumn();
+    } catch (Throwable) {
+        return 0;
+    }
+}
+
 function cohort_public_archive(array $fallbackCohorts): array
 {
     $archive = [
@@ -454,12 +485,7 @@ function cohort_public_archive(array $fallbackCohorts): array
     ];
 
     try {
-        $rows = db()->query(
-            'SELECT *
-             FROM cohorts
-             WHERE status = "published"
-             ORDER BY is_featured DESC, sort_order ASC, COALESCE(published_at, created_at) DESC, id DESC'
-        )->fetchAll();
+        $rows = cohort_public_rows('is_featured DESC, sort_order ASC, COALESCE(published_at, created_at) DESC, id DESC');
 
         $archive['items'] = array_map('cohort_public_from_row', $rows);
 
@@ -467,6 +493,54 @@ function cohort_public_archive(array $fallbackCohorts): array
     } catch (Throwable) {
         return $fallbackCohorts;
     }
+}
+
+/**
+ * The homepage feed: the featured cohort first, then the newest published ones,
+ * capped at $limit. Heading, intro, and note still come from the homepage editor.
+ * Falls back to the homepage editor's own cohort cards when nothing is published
+ * (or the cohorts table has not been migrated yet).
+ */
+function cohort_public_recent(array $fallbackCohorts, ?int $limit = null): array
+{
+    $limit = $limit !== null && $limit > 0 ? $limit : cohort_home_limit();
+
+    $recent = [
+        'heading' => (string) ($fallbackCohorts['heading'] ?? 'Recent Cohorts'),
+        'intro' => (string) ($fallbackCohorts['intro'] ?? ''),
+        'items' => [],
+        'note' => (string) ($fallbackCohorts['note'] ?? ''),
+        'total_published' => 0,
+        'has_more' => false,
+    ];
+
+    try {
+        $rows = cohort_public_rows('is_featured DESC, COALESCE(published_at, created_at) DESC, id DESC', $limit);
+        $items = array_map('cohort_public_from_row', $rows);
+
+        if ($items === []) {
+            return cohort_recent_fallback($fallbackCohorts);
+        }
+
+        $recent['items'] = $items;
+        $recent['total_published'] = max(cohort_public_published_count(), count($items));
+        $recent['has_more'] = $recent['total_published'] > count($items);
+
+        return $recent;
+    } catch (Throwable) {
+        return cohort_recent_fallback($fallbackCohorts);
+    }
+}
+
+function cohort_recent_fallback(array $fallbackCohorts): array
+{
+    $items = array_values(array_filter($fallbackCohorts['items'] ?? [], 'is_array'));
+
+    return array_merge($fallbackCohorts, [
+        'items' => $items,
+        'total_published' => count($items),
+        'has_more' => false,
+    ]);
 }
 
 function cohort_public_from_row(array $row): array

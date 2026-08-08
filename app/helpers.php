@@ -357,10 +357,13 @@ function cohort_find_by_slug(array $cohorts, string $slug): ?array
 }
 
 /**
- * Build the responsive embed markup for a cohort video.
+ * Build the responsive embed markup for a cohort/event video.
  *
- * Accepts a YouTube/Vimeo link (rendered as a privacy-friendly, lazy iframe),
- * a direct video URL, or an uploaded file path (rendered as a <video> element).
+ * Accepts a YouTube/Vimeo link, a direct video URL, or an uploaded file path.
+ * Whenever a poster image is available the video renders as a click-to-play
+ * facade (poster + play button) so every card shows one clean 16:9 image
+ * instead of third-party player chrome, and no embed loads until it is clicked.
+ * For YouTube links without an uploaded poster, YouTube's own thumbnail is used.
  * Returns an empty string when no source is provided.
  */
 function cohort_video_html(string $video, string $title = '', string $poster = ''): string
@@ -371,30 +374,85 @@ function cohort_video_html(string $video, string $title = '', string $poster = '
         return '';
     }
 
-    $label = e($title !== '' ? $title : 'Cohort video');
+    $label = $title !== '' ? $title : 'Cohort video';
+    $posterUrl = trim($poster) !== '' ? asset(trim($poster)) : '';
 
     if (preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/|v/)|youtu\.be/)([A-Za-z0-9_-]{11})~', $video, $m) === 1) {
-        $src = 'https://www.youtube-nocookie.com/embed/' . $m[1] . '?rel=0';
+        $src = 'https://www.youtube-nocookie.com/embed/' . $m[1] . '?rel=0&autoplay=1';
 
-        return '<iframe class="cohort-frame" src="' . e($src) . '" title="' . $label . '"'
-            . ' loading="lazy" referrerpolicy="strict-origin-when-cross-origin"'
-            . ' allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"'
-            . ' allowfullscreen></iframe>';
+        // maxresdefault is 16:9 but missing on some uploads; hqdefault always
+        // exists and its 4:3 letterboxing is cropped away by object-fit: cover.
+        $posters = $posterUrl !== ''
+            ? [$posterUrl]
+            : ['https://i.ytimg.com/vi/' . $m[1] . '/maxresdefault.jpg', 'https://i.ytimg.com/vi/' . $m[1] . '/hqdefault.jpg'];
+
+        return cohort_video_facade('iframe', $src, $label, $posters);
     }
 
     if (preg_match('~vimeo\.com/(?:video/)?(\d+)~', $video, $m) === 1) {
         $src = 'https://player.vimeo.com/video/' . $m[1];
 
-        return '<iframe class="cohort-frame" src="' . e($src) . '" title="' . $label . '"'
+        if ($posterUrl !== '') {
+            return cohort_video_facade('iframe', $src . '?autoplay=1', $label, [$posterUrl]);
+        }
+
+        return '<iframe class="cohort-frame" src="' . e($src) . '" title="' . e($label) . '"'
             . ' loading="lazy" referrerpolicy="strict-origin-when-cross-origin"'
             . ' allow="fullscreen; picture-in-picture" allowfullscreen></iframe>';
     }
 
-    $src = preg_match('#^https?://#', $video) === 1 ? $video : asset($video);
-    $posterAttr = $poster !== '' ? ' poster="' . e(asset($poster)) . '"' : '';
+    $isRemote = preg_match('#^https?://#', $video) === 1;
+    $isVideoFile = preg_match('~\.(mp4|webm|ogg|ogv|mov|m4v)(?:[?\#]|$)~i', $video) === 1;
 
-    return '<video class="cohort-video" controls preload="none" playsinline' . $posterAttr . '>'
+    // An external link that is neither a known provider nor a video file cannot be
+    // embedded, so show the poster and send the visitor to the source instead of
+    // rendering a player that can never load.
+    if ($isRemote && ! $isVideoFile) {
+        return cohort_video_facade('link', $video, $label, [$posterUrl]);
+    }
+
+    $src = $isRemote ? $video : asset($video);
+
+    if ($posterUrl !== '') {
+        return cohort_video_facade('video', $src, $label, [$posterUrl]);
+    }
+
+    // No poster to show, so let the browser paint the first frame instead of a blank box.
+    return '<video class="cohort-video" controls preload="metadata" playsinline>'
         . '<source src="' . e($src) . '">'
         . 'Your browser does not support embedded video.'
         . '</video>';
+}
+
+/**
+ * Poster + play button placeholder. main.js swaps it for the real player on click.
+ * $posters is the poster URL plus optional fallbacks tried in order if one 404s.
+ */
+function cohort_video_facade(string $type, string $src, string $title, array $posters): string
+{
+    $posters = array_values(array_filter(array_map('trim', $posters), static fn (string $url): bool => $url !== ''));
+    $primary = $posters[0] ?? '';
+    $fallback = $posters[1] ?? '';
+    $label = e($title);
+
+    $image = $primary !== ''
+        ? '<img class="cohort-poster" src="' . e($primary) . '" alt="" loading="lazy" decoding="async"'
+            . ($fallback !== '' ? ' data-poster-fallback="' . e($fallback) . '"' : '') . '>'
+        : '';
+    $icon = '<span class="cohort-play-icon" aria-hidden="true"></span>';
+
+    if ($type === 'link') {
+        return '<a class="cohort-play" href="' . e($src) . '" target="_blank" rel="noopener"'
+            . ' aria-label="Watch video: ' . $label . '">' . $image . $icon . '</a>';
+    }
+
+    return '<button type="button" class="cohort-play" data-cohort-play'
+        . ' data-embed-type="' . e($type) . '"'
+        . ' data-embed-src="' . e($src) . '"'
+        . ' data-embed-title="' . $label . '"'
+        . ($primary !== '' ? ' data-embed-poster="' . e($primary) . '"' : '')
+        . ' aria-label="Play video: ' . $label . '">'
+        . $image
+        . $icon
+        . '</button>';
 }

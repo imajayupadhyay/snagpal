@@ -451,6 +451,32 @@
   .cohorts-post-media .cohort-frame,.cohorts-post-media .cohort-video,
   .cohort-watch-media .cohort-frame,.cohort-watch-media .cohort-video{
     position:absolute;inset:0;width:100%;height:100%;border:0;display:block;object-fit:cover;background:var(--accent-deep)}
+
+  /* click-to-play video poster (homepage, cohorts, cohort detail, events) */
+  .cohort-play{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;display:block;
+    background:var(--accent-deep);cursor:pointer;overflow:hidden;text-decoration:none;
+    -webkit-tap-highlight-color:transparent}
+  .cohort-poster{position:absolute;inset:0;width:100%;height:100%;display:block;
+    object-fit:cover;object-position:center;transition:transform .6s var(--ease)}
+  .cohort-play::after{content:"";position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(4,26,22,0.08) 0%,rgba(4,26,22,0.42) 100%);
+    transition:background .4s var(--ease)}
+  .cohort-play-icon{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:clamp(46px,5.5vw,64px);height:clamp(46px,5.5vw,64px);border-radius:50%;
+    background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.72);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease)}
+  .cohort-play-icon::before{content:"";display:block;margin-left:0.2em;font-size:clamp(0.85rem,1.1vw,1.05rem);
+    border-style:solid;border-width:0.52em 0 0.52em 0.85em;border-color:transparent transparent transparent #fff}
+  @media(hover:hover){
+    .cohort-play:hover .cohort-poster{transform:scale(1.05)}
+    .cohort-play:hover::after{background:linear-gradient(180deg,rgba(4,26,22,0.02) 0%,rgba(4,26,22,0.32) 100%)}
+    .cohort-play:hover .cohort-play-icon{background:var(--accent);border-color:var(--accent);
+      transform:translate(-50%,-50%) scale(1.08)}
+  }
+  .cohort-play:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+
   .cohorts-featured-body{padding:clamp(1.25rem,2.5vw,1.85rem)}
   .cohorts-featured-body .mono{color:var(--accent)}
   .cohorts-featured-body h2{margin-top:0.75rem;font-family:var(--cond);font-weight:700;text-transform:uppercase;
@@ -656,11 +682,21 @@
   .cohort-media{position:relative;aspect-ratio:16/9;background:var(--accent-deep);overflow:hidden}
   .cohort-media .cohort-frame,.cohort-media .cohort-video{position:absolute;inset:0;width:100%;height:100%;
     border:0;display:block;object-fit:cover;background:var(--accent-deep)}
-  .cohort-body{padding:clamp(1.2rem,2.4vw,1.7rem);display:flex;flex-direction:column;gap:0.5rem}
+  .cohort-body{flex:1;padding:clamp(1.2rem,2.4vw,1.7rem);display:flex;flex-direction:column;gap:0.5rem}
   .cohort-meta{color:var(--accent)}
   .cohort-card h3{font-family:var(--cond);font-weight:700;text-transform:uppercase;letter-spacing:0.01em;
     font-size:clamp(1.18rem,2vw,1.5rem);line-height:1.08}
+  .cohort-card h3 a{color:inherit;transition:color .3s var(--ease)}
+  .cohort-card h3 a:hover{color:var(--accent)}
   .cohort-body p{color:var(--muted);font-size:0.97rem;line-height:1.6;font-weight:300}
+  .cohort-card-link{margin-top:auto;padding-top:0.35rem}
+  .cohorts-actions{display:flex;justify-content:center;margin-top:clamp(1.4rem,2.8vw,2rem)}
+  .cohorts-all-link{display:inline-flex;align-items:center;gap:0.45rem;font-family:var(--cond);font-weight:700;
+    text-transform:uppercase;letter-spacing:0.02em;font-size:clamp(0.95rem,1.5vw,1.08rem);color:var(--ink);
+    border-bottom:2px solid color-mix(in srgb,var(--accent) 42%,transparent);padding-bottom:0.15rem;
+    transition:gap .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease)}
+  .cohorts-all-link::after{content:"\2192";font-weight:400}
+  .cohorts-all-link:hover{gap:0.75rem;color:var(--accent);border-color:var(--accent)}
   .cohorts-note{margin-top:clamp(1.6rem,3vw,2.2rem);font-family:var(--mono);font-size:0.66rem;
     letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)}
 
