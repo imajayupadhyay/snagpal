@@ -29,6 +29,26 @@ $updatedIso = seo_datetime_iso8601($page['updated_at'] ?? '');
 $updatedLabel = cohort_public_date_label($page['updated_at'] ?? '');
 $authorName = trim((string) ($page['author_name'] ?? 'Shweta Nagpal'));
 $authorUrl = trim((string) ($page['author_url'] ?? ''));
+
+// Video and photos are both optional. The hero media shows whichever exists,
+// and a photo-only cohort keeps its carousel there rather than repeating it in
+// the dedicated gallery section below.
+$watchMedia = cohort_media_html($cohort, 'feature');
+$watchIsGallery = cohort_gallery_is_primary($cohort);
+$galleryHtml = cohort_has_gallery($cohort) && ! $watchIsGallery
+    ? gallery_carousel_html($cohort['gallery'], (string) ($cohort['title'] ?? ''), 'stage')
+    : '';
+$descriptionHtml = cohort_description_html($cohort['description'] ?? '');
+$hasVideo = trim((string) ($cohort['video'] ?? '')) !== '';
+$mediaFormat = 'Field notes';
+
+if ($hasVideo && cohort_has_gallery($cohort)) {
+    $mediaFormat = 'Video, photos + field notes';
+} elseif ($hasVideo) {
+    $mediaFormat = 'Video + field notes';
+} elseif (cohort_has_gallery($cohort)) {
+    $mediaFormat = 'Photo gallery + field notes';
+}
 ?>
 <main class="cohorts-main">
   <header class="cohort-detail-hero" id="top">
@@ -43,10 +63,13 @@ $authorUrl = trim((string) ($page['author_url'] ?? ''));
         <h1>
           <span class="clip"><span><?= e($cohort['title'] ?? 'Cohort') ?></span></span>
         </h1>
-        <p class="about-lede reveal d2"><?= e($cohort['description'] ?? '') ?></p>
+        <div class="about-lede rich-text reveal d2"><?= $descriptionHtml ?></div>
         <div class="about-actions reveal d3">
           <button class="cta" type="button" data-schedule-open><?= e($schedule['eyebrow'] ?? 'Schedule a Meet') ?></button>
           <a class="about-text-link" href="#notes">Read Notes</a>
+          <?php if ($galleryHtml !== ''): ?>
+            <a class="about-text-link" href="#gallery">View Photos</a>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -59,7 +82,7 @@ $authorUrl = trim((string) ($page['author_url'] ?? ''));
           </div>
           <div>
             <dt>Format</dt>
-            <dd>Video + field notes</dd>
+            <dd><?= e($mediaFormat) ?></dd>
           </div>
           <?php if ($publishedLabel !== ''): ?>
           <div>
@@ -94,18 +117,28 @@ $authorUrl = trim((string) ($page['author_url'] ?? ''));
     </div>
   </header>
 
-  <section class="cohort-watch">
-    <div class="cohort-watch-grid">
-      <div class="cohort-watch-media reveal">
-        <?= cohort_video_html((string) ($cohort['video'] ?? ''), (string) ($cohort['title'] ?? ''), (string) ($cohort['poster'] ?? '')) ?>
+  <?php if ($watchMedia !== ''): ?>
+    <section class="cohort-watch">
+      <div class="cohort-watch-grid">
+        <div class="cohort-watch-media reveal"><?= $watchMedia ?></div>
+        <aside class="cohort-watch-note reveal d2">
+          <span class="mono"><?= $watchIsGallery ? 'Photo Record' : 'Session Brief' ?></span>
+          <h2><?= e($cohort['title'] ?? '') ?></h2>
+          <div class="rich-text"><?= $descriptionHtml ?></div>
+        </aside>
       </div>
-      <aside class="cohort-watch-note reveal d2">
-        <span class="mono">Session Brief</span>
-        <h2><?= e($cohort['title'] ?? '') ?></h2>
-        <p><?= e($cohort['description'] ?? '') ?></p>
-      </aside>
-    </div>
-  </section>
+    </section>
+  <?php endif; ?>
+
+  <?php if ($galleryHtml !== ''): ?>
+    <section class="cohort-gallery-section" id="gallery">
+      <div class="head">
+        <h2>Photo Gallery</h2>
+        <span class="rule reveal"></span>
+      </div>
+      <div class="cohort-gallery-stage reveal"><?= $galleryHtml ?></div>
+    </section>
+  <?php endif; ?>
 
   <section class="cohort-article" id="notes">
     <article class="cohort-article-body">
@@ -141,7 +174,7 @@ $authorUrl = trim((string) ($page['author_url'] ?? ''));
           <article class="cohort-related-card reveal d<?= e((string) min($index + 1, 4)) ?>">
             <span class="mono"><?= e($item['meta'] ?? 'Cohort') ?></span>
             <h3><a href="<?= e($item['detail_url']) ?>"><?= e($item['title'] ?? '') ?></a></h3>
-            <p><?= e($item['description'] ?? '') ?></p>
+            <div class="rich-text"><?= cohort_description_html($item['description'] ?? '') ?></div>
             <a class="cohorts-post-link" href="<?= e($item['detail_url']) ?>">Open Detail</a>
           </article>
         <?php endforeach; ?>

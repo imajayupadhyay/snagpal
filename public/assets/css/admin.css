@@ -248,6 +248,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .form-panel>.form-grid,.form-panel>.repeat-list,.form-panel>.field,.form-panel>h3,
 .form-panel>.schedule-create-form{margin-left:24px;margin-right:24px}
 .form-panel>.form-grid,.form-panel>.repeat-list,.form-panel>.field{margin-bottom:24px}
+.form-panel>.hint,.form-panel>.empty-state{margin-left:24px;margin-right:24px}
+.form-panel>.hint{margin-top:16px}
+.form-panel>.empty-state{margin-bottom:24px}
 .form-panel>h3{font-family:var(--cond);text-transform:uppercase;margin:24px 0 14px;font-size:1.02rem;
   color:var(--ink-soft);letter-spacing:.02em}
 .schedule-create-form{padding:0 24px 24px}
@@ -281,6 +284,22 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .media-field{display:grid;gap:10px}
 .media-field img{width:100%;max-width:200px;aspect-ratio:4/3;object-fit:cover;border-radius:var(--radius-xs);
   border:1px solid var(--line);background:#fff}
+
+/* ---------- photo gallery manager (cohorts + events) ---------- */
+.gallery-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;
+  padding:0 24px 4px}
+.gallery-admin-item{display:grid;gap:12px;padding:14px;border:1px solid var(--line);
+  border-radius:var(--radius-xs);background:var(--panel-2)}
+.gallery-admin-item:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(12,94,85,.1)}
+.gallery-admin-item>img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--radius-xs);
+  border:1px solid var(--line);background:#fff;display:block}
+.gallery-admin-fields{display:grid;gap:10px}
+.gallery-admin-fields input{background:var(--panel)}
+.gallery-admin-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+.gallery-admin-remove{margin:0;padding:9px 12px}
+.gallery-admin-remove:has(input:checked){border-color:rgba(176,58,46,.5);background:rgba(176,58,46,.08);
+  color:#8E2B22}
+.gallery-admin-grid+.hint{margin:12px 24px 0}
 
 /* ---------- header menu manager ---------- */
 .header-preview-panel .panel-head{margin-bottom:0}
@@ -330,6 +349,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .wysiwyg-surface a{color:var(--accent);font-weight:700}
 .wysiwyg-surface:focus{box-shadow:inset 0 0 0 2px rgba(12,94,85,.18)}
 .wysiwyg-toolbar-rich{flex-wrap:wrap}
+.wysiwyg-sep{width:1px;height:20px;background:var(--line);margin:0 2px;flex:0 0 auto}
+.wysiwyg-description-surface{min-height:170px}
+.wysiwyg-surface [style*="text-align"]{display:block}
 
 /* ---------- weekday tiles ---------- */
 .weekday-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}

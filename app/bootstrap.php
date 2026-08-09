@@ -23,6 +23,7 @@ require APP_PATH . '/mailer.php';
 require APP_PATH . '/notifications.php';
 require APP_PATH . '/seo.php';
 require APP_PATH . '/homepage.php';
+require APP_PATH . '/gallery.php';
 require APP_PATH . '/cohorts.php';
 require APP_PATH . '/cohort_categories.php';
 require APP_PATH . '/events.php';

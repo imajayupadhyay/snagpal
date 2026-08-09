@@ -45,7 +45,7 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
     <?php else: ?>
       <div class="events-grid">
         <?php foreach ($upcoming as $index => $item): ?>
-          <?php $embed = cohort_video_html((string) ($item['video'] ?? ''), (string) ($item['title'] ?? ''), (string) ($item['poster'] ?? '')); ?>
+          <?php $embed = cohort_media_html($item); ?>
           <article class="event-card is-upcoming reveal d<?= e((string) min($index + 1, 4)) ?>">
             <?php if ($embed !== ''): ?>
               <div class="event-card-media"><?= $embed ?></div>
@@ -56,7 +56,7 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
                 <em><?= e($item['meta'] ?? '') ?></em>
               </div>
               <h3><?= e($item['title'] ?? '') ?></h3>
-              <p><?= e($item['description'] ?? '') ?></p>
+              <div class="rich-text"><?= cohort_description_html($item['description'] ?? '') ?></div>
               <?php if (! empty($item['location'])): ?>
                 <div class="event-card-detail"><?= e($item['location']) ?></div>
               <?php endif; ?>
@@ -80,7 +80,7 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
     <?php else: ?>
       <div class="events-grid">
         <?php foreach ($past as $index => $item): ?>
-          <?php $embed = cohort_video_html((string) ($item['video'] ?? ''), (string) ($item['title'] ?? ''), (string) ($item['poster'] ?? '')); ?>
+          <?php $embed = cohort_media_html($item); ?>
           <article class="event-card is-past reveal d<?= e((string) min($index + 1, 4)) ?>">
             <?php if ($embed !== ''): ?>
               <div class="event-card-media"><?= $embed ?></div>
@@ -91,7 +91,7 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
                 <em><?= e($item['meta'] ?? '') ?></em>
               </div>
               <h3><?= e($item['title'] ?? '') ?></h3>
-              <p><?= e($item['description'] ?? '') ?></p>
+              <div class="rich-text"><?= cohort_description_html($item['description'] ?? '') ?></div>
               <?php if (! empty($item['location'])): ?>
                 <div class="event-card-detail"><?= e($item['location']) ?></div>
               <?php endif; ?>

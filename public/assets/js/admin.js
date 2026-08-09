@@ -31,6 +31,123 @@
     return values.join('\n\n');
   }
 
+  /* ---- paste cleaning -------------------------------------------------
+     Pasted content (Word, Google Docs, other sites, or another browser tab)
+     arrives wrapped in spans, font tags, classes, and inline styles. Dropping
+     it wholesale loses the paragraphs; keeping it wholesale drags foreign
+     styling into the site. So it is rebuilt against the same allow-list the
+     PHP sanitiser uses, keeping structure and alignment and nothing else. */
+  var PASTE_ALLOWED={P:1,H2:1,H3:1,H4:1,STRONG:1,B:1,EM:1,I:1,U:1,UL:1,OL:1,LI:1,BLOCKQUOTE:1,A:1,BR:1};
+  var PASTE_DROPPED={SCRIPT:1,STYLE:1,META:1,LINK:1,NOSCRIPT:1,SVG:1,IMG:1,IFRAME:1,OBJECT:1,EMBED:1,INPUT:1,BUTTON:1,SELECT:1,TEXTAREA:1};
+  var PASTE_TEXT_BLOCK={P:1,H2:1,H3:1,H4:1,BLOCKQUOTE:1};
+  var PASTE_BLOCK={P:1,H2:1,H3:1,H4:1,LI:1,BLOCKQUOTE:1,UL:1,OL:1};
+  var PASTE_BLOCK_SELECTOR='p,div,h1,h2,h3,h4,h5,h6,ul,ol,li,blockquote,table,tr,pre';
+
+  function pasteAlignment(node){
+    var value=(node.style&&node.style.textAlign)||node.getAttribute('align')||'';
+    value=String(value).toLowerCase().trim();
+
+    return /^(left|right|center|justify)$/.test(value)?value:'';
+  }
+
+  function cleanPastedInto(source,target){
+    var nodes=[].slice.call(source.childNodes);
+
+    nodes.forEach(function(node){
+      if(node.nodeType===3){
+        target.appendChild(document.createTextNode(node.nodeValue.replace(/ /g,' ')));
+        return;
+      }
+
+      if(node.nodeType!==1||PASTE_DROPPED[node.tagName]){
+        return;
+      }
+
+      // A <div> is only a paragraph when it holds text. Layout wrappers that
+      // contain their own blocks must be unwrapped, or every block inside them
+      // gets flattened into one paragraph.
+      var tag=node.tagName;
+
+      if(tag==='DIV'){
+        tag=node.querySelector(PASTE_BLOCK_SELECTOR)?'':'P';
+      }
+
+      if(!tag){
+        cleanPastedInto(node,target);
+        return;
+      }
+
+      var parent=target.tagName||'';
+
+      // Unknown wrappers (span, font, table cells, …) keep their text but lose
+      // themselves, so a paste never nests foreign structure into the page.
+      if(!PASTE_ALLOWED[tag]){
+        cleanPastedInto(node,target);
+        return;
+      }
+
+      // A paragraph inside a paragraph is invalid; flatten it instead.
+      if(PASTE_TEXT_BLOCK[tag]&&PASTE_TEXT_BLOCK[parent]){
+        cleanPastedInto(node,target);
+        return;
+      }
+
+      // A list item only means something inside a list.
+      if(tag==='LI'&&parent!=='UL'&&parent!=='OL'){
+        tag='P';
+      }
+
+      var element=document.createElement(tag);
+
+      if(tag==='A'){
+        var href=node.getAttribute('href')||'';
+
+        if(/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(href)&&href.length<=500){
+          element.setAttribute('href',href);
+        }
+      }
+
+      if(PASTE_BLOCK[tag]){
+        var align=pasteAlignment(node);
+
+        if(align){
+          element.style.textAlign=align;
+        }
+      }
+
+      cleanPastedInto(node,element);
+      target.appendChild(element);
+    });
+  }
+
+  function sanitizePastedHtml(html){
+    // Parse into an inert document. Assigning to a live element's innerHTML
+    // would fetch images and fire their inline handlers (an onerror in pasted
+    // markup is enough to run script), which must never happen here.
+    var parsed;
+
+    try{
+      parsed=new DOMParser().parseFromString(html,'text/html');
+    }catch(error){
+      return plainTextToHtml(String(html).replace(/<[^>]*>/g,''));
+    }
+
+    var clean=document.createElement('div');
+    cleanPastedInto(parsed.body||parsed.documentElement,clean);
+
+    return clean.innerHTML;
+  }
+
+  function plainTextToHtml(text){
+    return String(text).replace(/\r\n?/g,'\n').split(/\n\s*\n/).map(function(block){
+      var escaped=block.trim()
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/\n/g,'<br>');
+
+      return escaped===''?'':'<p>'+escaped+'</p>';
+    }).join('');
+  }
+
   function initRichEditor(editor){
     var source=document.getElementById(editor.getAttribute('data-editor-for'));
     var surface=editor.querySelector('.wysiwyg-surface');
@@ -70,6 +187,25 @@
       });
     });
 
+    surface.addEventListener('paste',function(event){
+      var clipboard=event.clipboardData||window.clipboardData;
+
+      if(!clipboard){
+        return;
+      }
+
+      var html=clipboard.getData('text/html');
+      var replacement=html?sanitizePastedHtml(html):plainTextToHtml(clipboard.getData('text/plain')||'');
+
+      if(!replacement){
+        return;
+      }
+
+      event.preventDefault();
+      document.execCommand('insertHTML',false,replacement);
+      sync();
+    });
+
     surface.addEventListener('input',sync);
     surface.addEventListener('blur',sync);
 
@@ -81,6 +217,12 @@
 
     sync();
   }
+
+  // Pressing Enter should start a new <p>, not the <div> Chrome defaults to,
+  // so what the editor produces matches what the sanitiser keeps.
+  try{
+    document.execCommand('defaultParagraphSeparator',false,'p');
+  }catch(error){}
 
   document.querySelectorAll('[data-rich-editor]').forEach(initRichEditor);
 

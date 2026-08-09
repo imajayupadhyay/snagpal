@@ -8,8 +8,12 @@
 !/storage/sessions/.gitkeep
 
 # Admin-uploaded media (user content)
+# NOTE: this whole tree is also excluded from the deploy rsync, so anything
+# kept here is for local dev only — the server copy is written by the
+# Jenkins "Server Setup" stage.
 /public/uploads/*
 !/public/uploads/.gitkeep
+!/public/uploads/.htaccess
 !/public/uploads/homepage/.gitkeep
 
 # CI / deployment pipeline (kept out of the repo)

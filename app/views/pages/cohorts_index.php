@@ -24,14 +24,15 @@ $cohortCategories = cohort_categories_for_filter($items);
       </div>
 
       <?php if ($featured !== null): ?>
+        <?php $featuredMedia = cohort_media_html($featured, 'feature'); ?>
         <aside class="cohorts-featured-panel reveal d2">
-          <div class="cohorts-featured-media">
-            <?= cohort_video_html((string) ($featured['video'] ?? ''), (string) ($featured['title'] ?? ''), (string) ($featured['poster'] ?? '')) ?>
-          </div>
+          <?php if ($featuredMedia !== ''): ?>
+            <div class="cohorts-featured-media"><?= $featuredMedia ?></div>
+          <?php endif; ?>
           <div class="cohorts-featured-body">
             <span class="mono"><?= e($featured['meta'] ?? 'Featured Cohort') ?></span>
             <h2><?= e($featured['title'] ?? '') ?></h2>
-            <p><?= e($featured['description'] ?? '') ?></p>
+            <div class="rich-text"><?= cohort_description_html($featured['description'] ?? '') ?></div>
             <a class="about-text-link" href="<?= e($featured['detail_url']) ?>">Read Notes</a>
           </div>
         </aside>
@@ -78,17 +79,18 @@ $cohortCategories = cohort_categories_for_filter($items);
 
       <div class="cohorts-archive-grid" data-cohort-grid>
         <?php foreach ($items as $index => $item): ?>
+          <?php $cardMedia = cohort_media_html($item); ?>
           <article class="cohorts-post-card reveal d<?= e((string) min($index + 1, 4)) ?>" data-cohort-category="<?= e((string) ($item['category_slug'] ?? '')) ?>">
-            <div class="cohorts-post-media">
-              <?= cohort_video_html((string) ($item['video'] ?? ''), (string) ($item['title'] ?? ''), (string) ($item['poster'] ?? '')) ?>
-            </div>
+            <?php if ($cardMedia !== ''): ?>
+              <div class="cohorts-post-media"><?= $cardMedia ?></div>
+            <?php endif; ?>
             <div class="cohorts-post-body">
               <div class="cohorts-post-meta">
                 <span><?= e($item['meta'] ?? ('Cohort ' . ($index + 1))) ?></span>
                 <em><?= e(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) ?></em>
               </div>
               <h3><a href="<?= e($item['detail_url']) ?>"><?= e($item['title'] ?? '') ?></a></h3>
-              <p><?= e($item['description'] ?? '') ?></p>
+              <div class="rich-text"><?= cohort_description_html($item['description'] ?? '') ?></div>
               <a class="cohorts-post-link" href="<?= e($item['detail_url']) ?>">Open Detail</a>
             </div>
           </article>

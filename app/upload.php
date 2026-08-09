@@ -480,6 +480,137 @@ function upload_event_poster(string $fieldName, string $currentPath, array &$err
     return 'uploads/events/' . $filename;
 }
 
+/**
+ * Store a batch of gallery photos for one cohort/event.
+ *
+ * Files go into that owner's own folder — public/uploads/{cohorts|events}/gallery/{id}/ —
+ * which the deploy pipeline never deletes. Each file is validated on its real
+ * MIME type, gets a generated name, and a bad file only skips itself rather
+ * than failing the whole batch.
+ *
+ * @return array<int, string> Relative paths of the files that were stored.
+ */
+function upload_gallery_photos(string $fieldName, string $ownerType, int $ownerId, array &$errors): array
+{
+    if (! gallery_owner_is_valid($ownerType) || $ownerId <= 0) {
+        return [];
+    }
+
+    if (empty($_FILES[$fieldName]) || ! is_array($_FILES[$fieldName])) {
+        return [];
+    }
+
+    $files = upload_normalize_file_array($_FILES[$fieldName]);
+    $files = array_values(array_filter(
+        $files,
+        static fn (array $file): bool => (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE
+    ));
+
+    if ($files === []) {
+        return [];
+    }
+
+    $alreadyStored = gallery_count($ownerType, $ownerId);
+    $remaining = gallery_max_photos() - $alreadyStored;
+
+    if ($remaining <= 0) {
+        $errors[] = 'This gallery already holds the maximum of ' . gallery_max_photos() . ' photos. Remove some before adding more.';
+
+        return [];
+    }
+
+    if (count($files) > $remaining) {
+        $errors[] = 'Only ' . $remaining . ' more photo(s) fit in this gallery, so the extra files were skipped.';
+        $files = array_slice($files, 0, $remaining);
+    }
+
+    $relativeDirectory = gallery_owner_directory($ownerType, $ownerId);
+    $directory = PUBLIC_PATH . '/' . $relativeDirectory;
+
+    if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+        $errors[] = 'Unable to create the gallery upload directory.';
+
+        return [];
+    }
+
+    $extensions = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+    $stored = [];
+
+    foreach ($files as $file) {
+        $originalName = (string) ($file['name'] ?? 'photo');
+
+        if ((int) ($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+            $errors[] = 'Upload failed for "' . $originalName . '". It may be larger than the server limit.';
+            continue;
+        }
+
+        $tmpName = (string) ($file['tmp_name'] ?? '');
+
+        if ($tmpName === '' || ! is_uploaded_file($tmpName)) {
+            $errors[] = 'Invalid photo upload for "' . $originalName . '".';
+            continue;
+        }
+
+        if ((int) ($file['size'] ?? 0) > 5 * 1024 * 1024) {
+            $errors[] = 'Photo "' . $originalName . '" is larger than 5 MB and was skipped.';
+            continue;
+        }
+
+        $mime = (new finfo(FILEINFO_MIME_TYPE))->file($tmpName);
+
+        if (! isset($extensions[$mime])) {
+            $errors[] = 'Photo "' . $originalName . '" is not a JPG, PNG, or WebP image and was skipped.';
+            continue;
+        }
+
+        $filename = date('YmdHis') . '-' . bin2hex(random_bytes(6)) . '.' . $extensions[$mime];
+
+        if (! move_uploaded_file($tmpName, $directory . '/' . $filename)) {
+            $errors[] = 'Unable to store photo "' . $originalName . '".';
+            continue;
+        }
+
+        $stored[] = $relativeDirectory . '/' . $filename;
+    }
+
+    return $stored;
+}
+
+/**
+ * Turn PHP's column-major $_FILES entry for a multi-file input into a plain
+ * list of per-file arrays. Also accepts a single-file entry.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function upload_normalize_file_array(array $entry): array
+{
+    if (! isset($entry['name'])) {
+        return [];
+    }
+
+    if (! is_array($entry['name'])) {
+        return [$entry];
+    }
+
+    $files = [];
+
+    foreach (array_keys($entry['name']) as $index) {
+        $files[] = [
+            'name' => $entry['name'][$index] ?? '',
+            'type' => $entry['type'][$index] ?? '',
+            'tmp_name' => $entry['tmp_name'][$index] ?? '',
+            'error' => $entry['error'][$index] ?? UPLOAD_ERR_NO_FILE,
+            'size' => $entry['size'][$index] ?? 0,
+        ];
+    }
+
+    return $files;
+}
+
 function upload_event_video(string $fieldName, string $currentPath, array &$errors): string
 {
     if (empty($_FILES[$fieldName]) || ! is_array($_FILES[$fieldName])) {

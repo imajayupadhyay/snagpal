@@ -48,6 +48,18 @@ try {
 
                     if ($errors === []) {
                         $savedId = event_admin_save($form, (int) $admin['id']);
+
+                        // Gallery work runs after the save so a brand-new event
+                        // already has the id its photo folder is named after.
+                        $galleryErrors = [];
+                        gallery_save_from_post('event', $savedId, $_POST, (int) $admin['id'], $galleryErrors);
+                        $uploaded = upload_gallery_photos('gallery_upload', 'event', $savedId, $galleryErrors);
+                        gallery_add_photos('event', $savedId, $uploaded, (int) $admin['id']);
+
+                        if ($galleryErrors !== []) {
+                            flash('error', implode(' ', $galleryErrors));
+                        }
+
                         flash('success', $id > 0 ? 'Event updated.' : 'Event created.');
                         redirect(admin_events_url(['edit' => $savedId]));
                     }
@@ -73,6 +85,13 @@ try {
     $errors[] = 'The events table is not ready. Run php scripts/migrate.php from the portfolio folder.';
 }
 
+$galleryPhotos = gallery_photos_for('event', isset($form['id']) ? (int) $form['id'] : null);
+$flashedError = flash('error');
+
+if ($flashedError !== null) {
+    $errors[] = $flashedError;
+}
+
 render('admin/events', [
     'admin' => $admin,
     'events' => $events,
@@ -80,6 +99,7 @@ render('admin/events', [
     'form' => $form,
     'editing' => $editing,
     'pageContent' => $pageContent,
+    'galleryPhotos' => $galleryPhotos,
     'errors' => $errors,
     'success' => flash('success'),
     'pageTitle' => 'Events',

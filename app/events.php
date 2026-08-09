@@ -131,7 +131,7 @@ function event_admin_from_post(array $post, ?array $current = null): array
         'id' => $current['id'],
         'title' => homepage_text($post['title'] ?? ''),
         'meta_label' => homepage_text($post['meta_label'] ?? ''),
-        'description' => homepage_textarea($post['description'] ?? ''),
+        'description' => cohort_rich_content($post['description'] ?? ''),
         'event_date' => event_admin_date_value($post['event_date'] ?? ''),
         'event_time_label' => homepage_text($post['event_time_label'] ?? ''),
         'location' => homepage_text($post['location'] ?? ''),
@@ -163,16 +163,10 @@ function event_admin_validate(array $event): array
         $errors[] = 'Add a description before publishing.';
     }
 
-    if ($event['video_source_type'] === 'link') {
-        if ($event['video_url'] === '' && $event['status'] === 'published') {
-            $errors[] = 'Add a video link before publishing.';
-        } elseif ($event['video_url'] !== '' && ! event_admin_url_is_allowed((string) $event['video_url'])) {
-            $errors[] = 'Use a valid http(s) video link.';
-        }
-    }
-
-    if ($event['video_source_type'] === 'upload' && $event['video_path'] === '' && $event['status'] === 'published') {
-        $errors[] = 'Upload a video before publishing, or switch the source to video link.';
+    // Video is optional — an event may have a video, a photo gallery, both, or
+    // neither. Only the format of a link that was actually entered is checked.
+    if ($event['video_url'] !== '' && ! event_admin_url_is_allowed((string) $event['video_url'])) {
+        $errors[] = 'Use a valid http(s) video link.';
     }
 
     if ($event['registration_url'] !== '' && ! event_admin_url_is_allowed((string) $event['registration_url'])) {
@@ -247,7 +241,14 @@ function event_admin_delete(int $id): array
     $statement = db()->prepare('DELETE FROM events WHERE id = :id LIMIT 1');
     $statement->execute(['id' => $id]);
 
-    return $statement->rowCount() > 0 ? [] : ['That event no longer exists.'];
+    if ($statement->rowCount() === 0) {
+        return ['That event no longer exists.'];
+    }
+
+    // Drop the gallery rows and their files so no orphan uploads are left.
+    gallery_delete_for_owner('event', $id);
+
+    return [];
 }
 
 function event_admin_statement_params(array $event, int $adminId): array
@@ -364,7 +365,7 @@ function event_public_archive(array $fallbackEvents): array
              ORDER BY sort_order ASC, COALESCE(published_at, created_at) DESC, id DESC'
         )->fetchAll();
 
-        $items = array_map('event_public_from_row', $rows);
+        $items = gallery_attach('event', array_map('event_public_from_row', $rows));
     } catch (Throwable) {
         $items = array_map(
             'event_public_from_legacy_item',
@@ -414,6 +415,7 @@ function event_public_from_row(array $row): array
         'description' => $event['description'],
         'video' => $video,
         'poster' => $event['poster_image'],
+        'gallery' => [],
         'date_label' => $dateLabel,
         'location' => $event['location'],
         'registration_label' => $event['registration_label'],
@@ -435,6 +437,7 @@ function event_public_from_legacy_item(array $item): array
         'description' => (string) ($item['description'] ?? ''),
         'video' => (string) ($item['video'] ?? ''),
         'poster' => (string) ($item['poster'] ?? ''),
+        'gallery' => [],
         'date_label' => '',
         'location' => '',
         'registration_label' => '',

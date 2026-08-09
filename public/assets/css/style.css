@@ -477,11 +477,102 @@
   }
   .cohort-play:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
 
+  /* ---------- photo gallery carousel (cohorts + events without a video) ----------
+     Layout is CSS scroll-snap, so swiping works with no JavaScript; main.js only
+     adds the arrows, dots, counter, and lightbox on top. */
+  .gal{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:var(--accent-deep)}
+  .gal-track{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;-ms-overflow-style:none}
+  .gal-track::-webkit-scrollbar{display:none}
+  .gal-track:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+  .gal-slide{position:relative;flex:0 0 100%;width:100%;height:100%;margin:0;scroll-snap-align:center;
+    scroll-snap-stop:always;background:var(--accent-deep);cursor:zoom-in}
+  .gal-image{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;
+    object-position:center;transition:transform .7s var(--ease)}
+  .gal-slide::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(4,26,22,0) 42%,rgba(4,26,22,0.55) 100%)}
+  @media(hover:hover){.gal-slide:hover .gal-image{transform:scale(1.04)}}
+  .gal-caption{position:absolute;left:0;right:0;bottom:0;z-index:2;
+    padding:clamp(2.4rem,5vw,3.2rem) clamp(0.9rem,2vw,1.3rem) clamp(0.7rem,1.6vw,1rem);
+    color:#F1F6F3;font-size:0.85rem;line-height:1.45;font-weight:300;
+    text-shadow:0 1px 12px rgba(4,26,22,0.6);pointer-events:none}
+  .gal-nav{position:absolute;z-index:3;top:50%;transform:translateY(-50%);
+    width:clamp(34px,3.4vw,42px);height:clamp(34px,3.4vw,42px);padding:0;border-radius:50%;
+    border:1px solid rgba(255,255,255,0.4);background:rgba(4,26,22,0.42);color:#fff;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:1.45rem;line-height:1;
+    opacity:0;transition:opacity .3s var(--ease),background .3s var(--ease),transform .3s var(--ease)}
+  .gal-prev{left:clamp(0.5rem,1.2vw,0.85rem)}
+  .gal-next{right:clamp(0.5rem,1.2vw,0.85rem)}
+  .gal:hover .gal-nav,.gal:focus-within .gal-nav{opacity:1}
+  .gal-nav:hover{background:var(--accent);border-color:rgba(255,255,255,0.8)}
+  .gal-nav:focus-visible{opacity:1;outline:2px solid #fff;outline-offset:2px}
+  .gal-nav[disabled]{opacity:0 !important;pointer-events:none}
+  .gal-dots{position:absolute;z-index:3;left:0;right:0;bottom:clamp(0.55rem,1.4vw,0.85rem);
+    display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0.4rem;padding:0 2.5rem}
+  .gal-dot{width:6px;height:6px;padding:0;border:0;border-radius:50%;background:#fff;opacity:0.42;
+    cursor:pointer;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+  .gal-dot:hover{opacity:0.75}
+  .gal-dot.on{opacity:1;transform:scale(1.45)}
+  .gal-dot:focus-visible{outline:2px solid #fff;outline-offset:3px}
+  .gal-count,.gal-badge{position:absolute;z-index:3;font-size:0.6rem;letter-spacing:0.08em;
+    text-transform:uppercase;color:#fff;background:rgba(4,26,22,0.5);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    padding:0.32em 0.6em;border-radius:100px;pointer-events:none}
+  .gal-count{right:clamp(0.55rem,1.4vw,0.85rem);bottom:clamp(0.55rem,1.4vw,0.85rem)}
+  .gal-badge{left:clamp(0.55rem,1.4vw,0.85rem);top:clamp(0.55rem,1.4vw,0.85rem);
+    background:rgba(4,26,22,0.44)}
+  .gal-badge::before{content:"";display:inline-block;width:0.62em;height:0.62em;margin-right:0.45em;
+    vertical-align:-0.02em;border:1.5px solid currentColor;border-radius:1px}
+  .gal-feature .gal-caption,.gal-stage .gal-caption{font-size:0.92rem}
+  .gal-stage .gal-slide{cursor:zoom-in}
+  @media(max-width:720px){
+    .gal-nav{opacity:1;background:rgba(4,26,22,0.5)}
+    .gal-badge{font-size:0.55rem}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .gal-track{scroll-behavior:auto}
+    .gal-image{transition:none}
+  }
+
+  /* fullscreen photo viewer, built on demand by main.js */
+  .gal-lightbox{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;
+    background:rgba(4,18,16,0.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    opacity:0;visibility:hidden;transition:opacity .3s var(--ease),visibility .3s var(--ease)}
+  .gal-lightbox.on{opacity:1;visibility:visible}
+  .gal-lightbox-stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;
+    padding:clamp(3.2rem,7vw,4.5rem) clamp(1rem,5vw,4.5rem) clamp(0.6rem,2vw,1rem);min-height:0}
+  .gal-lightbox-image{max-width:100%;max-height:100%;object-fit:contain;display:block;
+    border-radius:4px;box-shadow:0 40px 90px -40px rgba(0,0,0,0.9)}
+  .gal-lightbox-foot{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:1rem;
+    padding:0 clamp(1rem,5vw,4.5rem) clamp(1.1rem,3vw,1.8rem);text-align:center}
+  .gal-lightbox-caption{color:#DCE8E4;font-size:0.92rem;line-height:1.5;font-weight:300;
+    max-width:60ch}
+  .gal-lightbox-count{font-family:var(--mono);font-size:0.64rem;letter-spacing:0.08em;
+    text-transform:uppercase;color:rgba(220,232,228,0.6);white-space:nowrap}
+  .gal-lightbox-btn{position:absolute;z-index:2;width:clamp(40px,4vw,50px);height:clamp(40px,4vw,50px);
+    padding:0;border-radius:50%;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.08);
+    color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;
+    transition:background .3s var(--ease),border-color .3s var(--ease),transform .3s var(--ease)}
+  .gal-lightbox-btn:hover{background:var(--accent);border-color:rgba(255,255,255,0.6)}
+  .gal-lightbox-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .gal-lightbox-prev{left:clamp(0.5rem,2vw,1.5rem);top:50%;transform:translateY(-50%);font-size:1.7rem}
+  .gal-lightbox-next{right:clamp(0.5rem,2vw,1.5rem);top:50%;transform:translateY(-50%);font-size:1.7rem}
+  .gal-lightbox-prev:hover,.gal-lightbox-next:hover{transform:translateY(-50%) scale(1.06)}
+  .gal-lightbox-close{right:clamp(0.5rem,2vw,1.5rem);top:clamp(0.8rem,2vw,1.4rem);font-size:1.35rem}
+  .gal-lightbox-btn[hidden]{display:none}
+
+  /* dedicated gallery section on the cohort detail page */
+  .cohort-gallery-section{background:var(--bg-2)}
+  .cohort-gallery-stage{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:6px;
+    background:var(--accent-deep);box-shadow:0 30px 70px -36px var(--shadow)}
+
   .cohorts-featured-body{padding:clamp(1.25rem,2.5vw,1.85rem)}
   .cohorts-featured-body .mono{color:var(--accent)}
   .cohorts-featured-body h2{margin-top:0.75rem;font-family:var(--cond);font-weight:700;text-transform:uppercase;
     font-size:clamp(1.3rem,2.3vw,1.85rem);line-height:1.06}
-  .cohorts-featured-body p{margin:0.75rem 0 1.2rem;color:var(--muted);font-size:0.98rem;line-height:1.62;font-weight:300}
+  .cohorts-featured-body p,.cohorts-featured-body>.rich-text{margin:0.75rem 0 1.2rem;color:var(--muted);font-size:0.98rem;line-height:1.62;font-weight:300}
   .cohorts-stat-row .about-stat:nth-child(2) .about-stat-value{color:#415D7A}
   .cohorts-stat-row .about-stat:nth-child(3) .about-stat-value{color:#A65F4A}
   .cohorts-stat-row .about-stat:nth-child(4) .about-stat-value{color:#B88A44}
@@ -513,7 +604,8 @@
   .cohorts-post-card h3,.cohort-related-card h3{font-family:var(--cond);font-weight:700;text-transform:uppercase;
     font-size:clamp(1.12rem,2vw,1.45rem);line-height:1.08}
   .cohorts-post-card h3 a:hover,.cohort-related-card h3 a:hover{color:var(--accent)}
-  .cohorts-post-card p,.cohort-related-card p{color:var(--muted);font-size:0.96rem;line-height:1.62;font-weight:300}
+  .cohorts-post-card p,.cohort-related-card p,
+  .cohorts-post-body>.rich-text,.cohort-related-card>.rich-text{color:var(--muted);font-size:0.96rem;line-height:1.62;font-weight:300}
   .cohorts-post-link{margin-top:auto;display:inline-flex;width:max-content;align-items:center;gap:0.4rem;
     font-family:var(--cond);font-weight:700;text-transform:uppercase;color:var(--ink);
     border-bottom:2px solid color-mix(in srgb,var(--accent) 42%,transparent);padding-bottom:0.1rem;
@@ -543,7 +635,7 @@
   .cohort-watch-note .mono{color:var(--accent)}
   .cohort-watch-note h2{margin-top:0.75rem;font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.35rem,2.4vw,1.9rem);
     line-height:1.06}
-  .cohort-watch-note p{margin-top:0.85rem;color:var(--muted);font-size:0.98rem;line-height:1.64;font-weight:300}
+  .cohort-watch-note p,.cohort-watch-note>.rich-text{margin-top:0.85rem;color:var(--muted);font-size:0.98rem;line-height:1.64;font-weight:300}
 
   .cohort-article{display:grid;grid-template-columns:minmax(0,0.92fr) minmax(280px,0.42fr);gap:clamp(2rem,5vw,5rem);align-items:start}
   .cohort-article-body h2{margin-top:0.9rem;font-family:var(--cond);font-weight:700;text-transform:uppercase;
@@ -624,7 +716,7 @@
   .event-card-meta em{font-style:normal;color:var(--muted);text-align:right}
   .event-card h3{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.2rem,2.3vw,1.75rem);
     line-height:1.06}
-  .event-card p{margin-top:auto;color:var(--muted);font-size:0.98rem;line-height:1.64;font-weight:300}
+  .event-card p,.event-card-body>.rich-text{margin-top:auto;color:var(--muted);font-size:0.98rem;line-height:1.64;font-weight:300}
   .event-card-detail{margin-top:-0.4rem;font-family:var(--mono);font-size:0.68rem;letter-spacing:0.06em;
     text-transform:uppercase;color:var(--muted)}
   .event-card-cta{margin-top:0.3rem}
@@ -688,7 +780,7 @@
     font-size:clamp(1.18rem,2vw,1.5rem);line-height:1.08}
   .cohort-card h3 a{color:inherit;transition:color .3s var(--ease)}
   .cohort-card h3 a:hover{color:var(--accent)}
-  .cohort-body p{color:var(--muted);font-size:0.97rem;line-height:1.6;font-weight:300}
+  .cohort-body p,.cohort-body>.rich-text{color:var(--muted);font-size:0.97rem;line-height:1.6;font-weight:300}
   .cohort-card-link{margin-top:auto;padding-top:0.35rem}
   .cohorts-actions{display:flex;justify-content:center;margin-top:clamp(1.4rem,2.8vw,2rem)}
   .cohorts-all-link{display:inline-flex;align-items:center;gap:0.45rem;font-family:var(--cond);font-weight:700;
@@ -780,6 +872,38 @@
   .meeting-submit:disabled::after{display:none}
   .meeting-fineprint{margin:0.9rem 0 0;text-align:center;font-size:0.76rem;color:var(--muted);line-height:1.5}
   .hp-field{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important}
+
+  /* ---------- admin-authored rich text (cohort/event descriptions) ----------
+     The container keeps whatever colour, size, and weight its card already set,
+     so a description that is one plain paragraph looks exactly as it did before
+     this field became rich text. Only spacing and block styling are added.
+     Declared after the card rules so it wins the ties on source order. */
+  .rich-text>*:first-child{margin-top:0}
+  .rich-text>*:last-child{margin-bottom:0}
+  .rich-text p{margin:0 0 0.75em}
+  .rich-text h2,.rich-text h3,.rich-text h4{font-family:var(--cond);font-weight:700;text-transform:uppercase;
+    letter-spacing:0.01em;line-height:1.14;color:var(--ink);margin:1.1em 0 0.45em}
+  .rich-text h2{font-size:1.22em}
+  .rich-text h3{font-size:1.1em}
+  .rich-text h4{font-size:1em;letter-spacing:0.03em}
+  .rich-text ul,.rich-text ol{margin:0 0 0.75em;padding-left:1.35em}
+  .rich-text ul{list-style:disc}
+  .rich-text ol{list-style:decimal}
+  .rich-text li{margin-bottom:0.3em}
+  .rich-text li::marker{color:var(--accent)}
+  .rich-text blockquote{margin:0.85em 0;padding:0.15em 0 0.15em 0.95em;
+    border-left:2px solid color-mix(in srgb,var(--accent) 55%,transparent);font-style:italic}
+  .rich-text strong{font-weight:700;color:inherit}
+  .rich-text em{font-style:italic}
+  .rich-text u{text-decoration:underline;text-underline-offset:0.15em}
+  .rich-text a{color:var(--accent);text-decoration:underline;text-underline-offset:0.15em;
+    transition:color .3s var(--ease)}
+  .rich-text a:hover{color:var(--accent-deep)}
+  .rich-text br{line-height:inherit}
+
+  /* dark surfaces (the schedule/closing bands) invert the heading colour */
+  .schedule .rich-text h2,.schedule .rich-text h3,.schedule .rich-text h4,
+  .about-closing .rich-text h2,.about-closing .rich-text h3,.about-closing .rich-text h4{color:inherit}
 
   /* entrance animation (respects reduced-motion via the global rule) */
   @keyframes meetingFade{from{opacity:0}to{opacity:1}}

@@ -274,25 +274,18 @@ ob_start();
           </div>
           <div class="field full">
             <label for="cohort_description">Card description</label>
-            <textarea id="cohort_description" name="description" rows="4" placeholder="Description shown on archive cards and detail hero."><?= e($form['description']) ?></textarea>
+            <textarea id="cohort_description" class="rich-source" name="description"><?= e($form['description']) ?></textarea>
+            <div class="wysiwyg wysiwyg-rich" data-rich-editor data-editor-for="cohort_description" data-rich-mode="html">
+              <?php render('admin/partials/wysiwyg_toolbar', ['label' => 'Description formatting toolbar']); ?>
+              <div class="wysiwyg-surface wysiwyg-description-surface" contenteditable="true" role="textbox" aria-multiline="true"><?= cohort_rich_content_for_editor($form['description']) ?></div>
+            </div>
+            <p class="hint">Shown on archive cards and the detail hero. Paragraphs, headings, lists, and alignment are kept exactly as you set them here — pasted formatting is cleaned up automatically.</p>
           </div>
           <div class="field full">
             <label for="cohort_content">Article content</label>
             <textarea id="cohort_content" class="rich-source" name="content"><?= e($form['content']) ?></textarea>
             <div class="wysiwyg wysiwyg-rich" data-rich-editor data-editor-for="cohort_content" data-rich-mode="html">
-              <div class="wysiwyg-toolbar wysiwyg-toolbar-rich" aria-label="Article formatting toolbar">
-                <button type="button" data-command="formatBlock" data-value="p" title="Paragraph">P</button>
-                <button type="button" data-command="formatBlock" data-value="h2" title="Heading 2">H2</button>
-                <button type="button" data-command="formatBlock" data-value="h3" title="Heading 3">H3</button>
-                <button type="button" data-command="bold" title="Bold"><strong>B</strong></button>
-                <button type="button" data-command="italic" title="Italic"><em>I</em></button>
-                <button type="button" data-command="insertUnorderedList" title="Bullet list">List</button>
-                <button type="button" data-command="insertOrderedList" title="Numbered list">1. List</button>
-                <button type="button" data-command="formatBlock" data-value="blockquote" title="Quote">Quote</button>
-                <button type="button" data-command="createLink" title="Add link">Link</button>
-                <button type="button" data-command="unlink" title="Remove link">Unlink</button>
-                <button type="button" data-command="removeFormat" title="Clear formatting">Clear</button>
-              </div>
+              <?php render('admin/partials/wysiwyg_toolbar', ['label' => 'Article formatting toolbar']); ?>
               <div class="wysiwyg-surface wysiwyg-tall wysiwyg-article-surface" contenteditable="true" role="textbox" aria-multiline="true"><?= cohort_rich_content_for_editor($form['content']) ?></div>
             </div>
           </div>
@@ -307,9 +300,10 @@ ob_start();
         <div class="panel-head">
           <div>
             <p class="eyebrow">Media</p>
-            <h2>Video & Poster</h2>
+            <h2>Video &amp; Poster</h2>
           </div>
         </div>
+        <p class="hint">All optional. Leave the link and upload empty if this cohort has no video — use the Photo Gallery panel below instead.</p>
         <div class="form-grid">
           <div class="field">
             <label for="cohort_video_source">Video source</label>
@@ -320,9 +314,9 @@ ob_start();
             </select>
           </div>
           <div class="field">
-            <label for="cohort_video_url">Video link</label>
+            <label for="cohort_video_url">Video link <span class="muted">(optional)</span></label>
             <input id="cohort_video_url" name="video_url" value="<?= e($form['video_url']) ?>" maxlength="500" placeholder="https://youtube.com/watch?v=...">
-            <p class="hint">YouTube, Vimeo, or a direct video URL.</p>
+            <p class="hint">YouTube, Vimeo, or a direct video URL. Leave blank for a photo-only cohort.</p>
           </div>
           <div class="field">
             <label for="cohort_video_path">Current uploaded video path</label>
@@ -347,6 +341,12 @@ ob_start();
           </div>
         </div>
       </section>
+
+      <?php render('admin/partials/gallery_panel', [
+          'ownerLabel' => 'cohort',
+          'ownerId' => $form['id'] ?? null,
+          'photos' => $galleryPhotos ?? [],
+      ]); ?>
 
       <section class="panel form-panel">
         <div class="panel-head">

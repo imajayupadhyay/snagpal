@@ -357,6 +357,50 @@ function cohort_find_by_slug(array $cohorts, string $slug): ?array
 }
 
 /**
+ * Media for one cohort/event card or hero.
+ *
+ * Video and photos are both optional, so this picks whatever the entry has:
+ * the video when there is one, otherwise the photo carousel, otherwise nothing.
+ * $variant only changes the carousel's styling density (card vs. feature).
+ */
+function cohort_media_html(array $item, string $variant = 'card'): string
+{
+    $embed = cohort_video_html(
+        (string) ($item['video'] ?? ''),
+        (string) ($item['title'] ?? ''),
+        (string) ($item['poster'] ?? '')
+    );
+
+    if ($embed !== '') {
+        return $embed;
+    }
+
+    return gallery_carousel_html(
+        is_array($item['gallery'] ?? null) ? $item['gallery'] : [],
+        (string) ($item['title'] ?? ''),
+        $variant
+    );
+}
+
+/**
+ * True when an entry has photos to show in a dedicated gallery section.
+ */
+function cohort_has_gallery(array $item): bool
+{
+    return is_array($item['gallery'] ?? null) && $item['gallery'] !== [];
+}
+
+/**
+ * True when an entry's card media is already the photo carousel, i.e. it has
+ * photos but no video. Used so the detail page does not show the same
+ * carousel twice.
+ */
+function cohort_gallery_is_primary(array $item): bool
+{
+    return cohort_has_gallery($item) && trim((string) ($item['video'] ?? '')) === '';
+}
+
+/**
  * Build the responsive embed markup for a cohort/event video.
  *
  * Accepts a YouTube/Vimeo link, a direct video URL, or an uploaded file path.

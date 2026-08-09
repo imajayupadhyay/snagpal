@@ -256,7 +256,12 @@ ob_start();
           </div>
           <div class="field full">
             <label for="event_description">Description</label>
-            <textarea id="event_description" name="description" rows="4" placeholder="Shown on the event card."><?= e($form['description']) ?></textarea>
+            <textarea id="event_description" class="rich-source" name="description"><?= e($form['description']) ?></textarea>
+            <div class="wysiwyg wysiwyg-rich" data-rich-editor data-editor-for="event_description" data-rich-mode="html">
+              <?php render('admin/partials/wysiwyg_toolbar', ['label' => 'Description formatting toolbar']); ?>
+              <div class="wysiwyg-surface wysiwyg-description-surface" contenteditable="true" role="textbox" aria-multiline="true"><?= cohort_rich_content_for_editor($form['description']) ?></div>
+            </div>
+            <p class="hint">Shown on the event card. Paragraphs, headings, lists, and alignment are kept exactly as you set them here — pasted formatting is cleaned up automatically.</p>
           </div>
         </div>
       </section>
@@ -268,6 +273,7 @@ ob_start();
             <h2>Video &amp; Poster</h2>
           </div>
         </div>
+        <p class="hint">All optional. Leave the link and upload empty if this event has no video — use the Photo Gallery panel below instead.</p>
         <div class="form-grid">
           <div class="field">
             <label for="event_video_source">Video source</label>
@@ -278,9 +284,9 @@ ob_start();
             </select>
           </div>
           <div class="field">
-            <label for="event_video_url">Video link</label>
+            <label for="event_video_url">Video link <span class="muted">(optional)</span></label>
             <input id="event_video_url" name="video_url" value="<?= e($form['video_url']) ?>" maxlength="500" placeholder="https://youtube.com/watch?v=...">
-            <p class="hint">YouTube, Vimeo, or a direct video URL.</p>
+            <p class="hint">YouTube, Vimeo, or a direct video URL. Leave blank for a photo-only event.</p>
           </div>
           <div class="field">
             <label for="event_video_path">Current uploaded video path</label>
@@ -305,6 +311,12 @@ ob_start();
           </div>
         </div>
       </section>
+
+      <?php render('admin/partials/gallery_panel', [
+          'ownerLabel' => 'event',
+          'ownerId' => $form['id'] ?? null,
+          'photos' => $galleryPhotos ?? [],
+      ]); ?>
 
       <section class="panel form-panel">
         <div class="panel-head">

@@ -504,7 +504,13 @@ function seo_cohort_blog_posting_schema(array $seo, array $cohort, string $canon
         ],
     ];
 
-    $description = seo_textarea($cohort['description'] ?? ($cohort['excerpt'] ?? ''));
+    // The card description holds rich text, so JSON-LD gets the flattened form.
+    $description = cohort_description_text($cohort['description'] ?? '');
+
+    if ($description === '') {
+        $description = seo_textarea($cohort['excerpt'] ?? '');
+    }
+
     if ($description !== '') {
         $schema['description'] = $description;
     }

@@ -587,3 +587,142 @@
       if(type==='video'){var played=player.play();if(played&&played.catch)played.catch(function(){});}
     });
 })();
+
+/* photo gallery carousels (cohorts/events without a video) + fullscreen viewer.
+   Kept in its own IIFE so an error elsewhere can never break the galleries.
+   The track is CSS scroll-snap, so swipe already works without this file. */
+(function(){
+  var galleries=document.querySelectorAll('[data-gallery]');
+  if(!galleries.length) return;
+
+  var lightbox=null,lbImage=null,lbCaption=null,lbCount=null,lbPrev=null,lbNext=null;
+  var lbPhotos=[],lbIndex=0,lbOpener=null;
+
+  function photosOf(gal){
+    var out=[];
+    gal.querySelectorAll('.gal-image').forEach(function(img){
+      out.push({src:img.currentSrc||img.src,alt:img.alt||'',caption:img.getAttribute('data-gal-caption')||''});
+    });
+    return out;
+  }
+
+  function buildLightbox(){
+    if(lightbox) return;
+    lightbox=document.createElement('div');
+    lightbox.className='gal-lightbox';
+    lightbox.setAttribute('role','dialog');
+    lightbox.setAttribute('aria-modal','true');
+    lightbox.setAttribute('aria-label','Photo viewer');
+    lightbox.innerHTML=
+      '<div class="gal-lightbox-stage">'+
+        '<img class="gal-lightbox-image" src="" alt="">'+
+        '<button type="button" class="gal-lightbox-btn gal-lightbox-prev" aria-label="Previous photo"><span aria-hidden="true">&#8249;</span></button>'+
+        '<button type="button" class="gal-lightbox-btn gal-lightbox-next" aria-label="Next photo"><span aria-hidden="true">&#8250;</span></button>'+
+        '<button type="button" class="gal-lightbox-btn gal-lightbox-close" aria-label="Close photo viewer"><span aria-hidden="true">&#10005;</span></button>'+
+      '</div>'+
+      '<div class="gal-lightbox-foot">'+
+        '<p class="gal-lightbox-caption"></p>'+
+        '<span class="gal-lightbox-count"></span>'+
+      '</div>';
+    document.body.appendChild(lightbox);
+    lbImage=lightbox.querySelector('.gal-lightbox-image');
+    lbCaption=lightbox.querySelector('.gal-lightbox-caption');
+    lbCount=lightbox.querySelector('.gal-lightbox-count');
+    lbPrev=lightbox.querySelector('.gal-lightbox-prev');
+    lbNext=lightbox.querySelector('.gal-lightbox-next');
+
+    lbPrev.addEventListener('click',function(){showLb(lbIndex-1);});
+    lbNext.addEventListener('click',function(){showLb(lbIndex+1);});
+    lightbox.querySelector('.gal-lightbox-close').addEventListener('click',closeLb);
+    lightbox.addEventListener('click',function(event){
+      if(event.target===lightbox||event.target.classList.contains('gal-lightbox-stage')) closeLb();
+    });
+    document.addEventListener('keydown',function(event){
+      if(!lightbox.classList.contains('on')) return;
+      if(event.key==='Escape'){closeLb();}
+      else if(event.key==='ArrowLeft'){showLb(lbIndex-1);}
+      else if(event.key==='ArrowRight'){showLb(lbIndex+1);}
+    });
+  }
+
+  function showLb(index){
+    if(!lbPhotos.length) return;
+    lbIndex=(index+lbPhotos.length)%lbPhotos.length;
+    var photo=lbPhotos[lbIndex];
+    lbImage.src=photo.src;
+    lbImage.alt=photo.alt;
+    lbCaption.textContent=photo.caption;
+    lbCaption.hidden=!photo.caption;
+    lbCount.textContent=(lbIndex+1)+' / '+lbPhotos.length;
+    var single=lbPhotos.length<2;
+    lbPrev.hidden=single;
+    lbNext.hidden=single;
+    lbCount.hidden=single;
+  }
+
+  function openLb(photos,index,opener){
+    if(!photos.length) return;
+    buildLightbox();
+    lbPhotos=photos;
+    lbOpener=opener||null;
+    showLb(index);
+    lightbox.classList.add('on');
+    document.body.style.overflow='hidden';
+    lightbox.querySelector('.gal-lightbox-close').focus();
+  }
+
+  function closeLb(){
+    if(!lightbox) return;
+    lightbox.classList.remove('on');
+    document.body.style.overflow='';
+    if(lbOpener&&lbOpener.focus){lbOpener.focus();}
+    lbOpener=null;
+  }
+
+  galleries.forEach(function(gal){
+    var track=gal.querySelector('[data-gal-track]');
+    if(!track) return;
+    var slides=track.querySelectorAll('.gal-slide');
+    var dots=gal.querySelectorAll('[data-gal-dot]');
+    var counter=gal.querySelector('[data-gal-count]');
+    var prev=gal.querySelector('[data-gal="prev"]');
+    var next=gal.querySelector('[data-gal="next"]');
+    if(!slides.length) return;
+
+    function current(){
+      var width=track.clientWidth||1;
+      return Math.max(0,Math.min(slides.length-1,Math.round(track.scrollLeft/width)));
+    }
+    function goTo(index){
+      var target=Math.max(0,Math.min(slides.length-1,index));
+      track.scrollTo({left:target*track.clientWidth,behavior:'smooth'});
+    }
+    function update(){
+      var index=current();
+      for(var i=0;i<dots.length;i++){dots[i].classList.toggle('on',i===index);}
+      if(counter) counter.textContent=(index+1)+' / '+slides.length;
+      if(prev) prev.disabled=index<=0;
+      if(next) next.disabled=index>=slides.length-1;
+    }
+
+    if(prev) prev.addEventListener('click',function(){goTo(current()-1);});
+    if(next) next.addEventListener('click',function(){goTo(current()+1);});
+    for(var d=0;d<dots.length;d++){
+      (function(idx){dots[idx].addEventListener('click',function(){goTo(idx);});})(d);
+    }
+    track.addEventListener('scroll',update,{passive:true});
+    window.addEventListener('resize',update);
+    track.addEventListener('keydown',function(event){
+      if(event.key==='ArrowLeft'){event.preventDefault();goTo(current()-1);}
+      else if(event.key==='ArrowRight'){event.preventDefault();goTo(current()+1);}
+    });
+
+    track.addEventListener('click',function(event){
+      var slide=event.target.closest('.gal-slide');
+      if(!slide) return;
+      openLb(photosOf(gal),parseInt(slide.getAttribute('data-gal-slide'),10)||0,track);
+    });
+
+    update();
+  });
+})();

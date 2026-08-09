@@ -16,7 +16,9 @@ if ($cohort === null) {
 
 $page = $site['page'];
 $page['title'] = ($cohort['title'] ?? 'Cohort') . ' - Shweta Nagpal Cohorts';
-$page['description'] = $cohort['description'] ?? 'Cohort detail from Shweta Nagpal on AI governance and public-sector technology.';
+// The card description is rich text now, so flatten it for the meta tag.
+$page['description'] = cohort_description_text($cohort['description'] ?? '')
+    ?: 'Cohort detail from Shweta Nagpal on AI governance and public-sector technology.';
 $page['og_type'] = 'article';
 $page['og_title'] = '';
 $page['og_description'] = '';

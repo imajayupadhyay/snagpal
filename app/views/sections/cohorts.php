@@ -26,7 +26,7 @@ $totalPublished = (int) ($cohorts['total_published'] ?? count($cohorts['items'])
     <div class="cohorts-track" id="cohortsTrack" role="group" aria-label="Cohort recordings">
       <?php foreach ($cohorts['items'] as $index => $item): ?>
         <?php
-        $embed = cohort_video_html($item['video'] ?? '', $item['title'] ?? '', $item['poster'] ?? '');
+        $embed = cohort_media_html($item);
         $detailUrl = (string) ($item['detail_url'] ?? '');
         ?>
         <article class="cohort-card reveal<?= $index > 0 ? ' d' . e((string) min($index, 4)) : '' ?>">
@@ -42,7 +42,8 @@ $totalPublished = (int) ($cohorts['total_published'] ?? count($cohorts['items'])
                 <?= e($item['title']) ?>
               <?php endif; ?>
             </h3>
-            <?php if (! empty($item['description'])): ?><p><?= e($item['description']) ?></p><?php endif; ?>
+            <?php $description = cohort_description_html($item['description'] ?? ''); ?>
+            <?php if ($description !== ''): ?><div class="rich-text"><?= $description ?></div><?php endif; ?>
             <?php if ($detailUrl !== ''): ?>
               <a class="cohorts-post-link cohort-card-link" href="<?= e($detailUrl) ?>">Open Detail</a>
             <?php endif; ?>

@@ -168,7 +168,7 @@ function cohort_admin_from_post(array $post, ?array $current = null): array
         'category_id' => $categoryId > 0 ? $categoryId : null,
         'meta_label' => homepage_text($post['meta_label'] ?? ''),
         'excerpt' => homepage_textarea($post['excerpt'] ?? ''),
-        'description' => homepage_textarea($post['description'] ?? ''),
+        'description' => cohort_rich_content($post['description'] ?? ''),
         'content' => cohort_rich_content($post['content'] ?? ''),
         'video_source_type' => in_array($sourceType, ['link', 'upload'], true) ? $sourceType : 'link',
         'video_url' => homepage_text($post['video_url'] ?? ''),
@@ -212,16 +212,10 @@ function cohort_admin_validate(array $cohort, ?int $ignoreId = null): array
         }
     }
 
-    if ($cohort['video_source_type'] === 'link') {
-        if ($cohort['video_url'] === '' && $cohort['status'] === 'published') {
-            $errors[] = 'Add a video link before publishing.';
-        } elseif ($cohort['video_url'] !== '' && ! cohort_admin_url_is_allowed((string) $cohort['video_url'])) {
-            $errors[] = 'Use a valid http(s) video link.';
-        }
-    }
-
-    if ($cohort['video_source_type'] === 'upload' && $cohort['video_path'] === '' && $cohort['status'] === 'published') {
-        $errors[] = 'Upload a video before publishing, or switch the source to video link.';
+    // Video is optional — a cohort may have a video, a photo gallery, both, or
+    // neither. Only the format of a link that was actually entered is checked.
+    if ($cohort['video_url'] !== '' && ! cohort_admin_url_is_allowed((string) $cohort['video_url'])) {
+        $errors[] = 'Use a valid http(s) video link.';
     }
 
     if ($cohort['resource_url'] !== '' && ! cohort_admin_url_is_allowed((string) $cohort['resource_url'])) {
@@ -331,7 +325,14 @@ function cohort_admin_delete(int $id): array
     $statement = db()->prepare('DELETE FROM cohorts WHERE id = :id LIMIT 1');
     $statement->execute(['id' => $id]);
 
-    return $statement->rowCount() > 0 ? [] : ['That cohort no longer exists.'];
+    if ($statement->rowCount() === 0) {
+        return ['That cohort no longer exists.'];
+    }
+
+    // Drop the gallery rows and their files so no orphan uploads are left.
+    gallery_delete_for_owner('cohort', $id);
+
+    return [];
 }
 
 function cohort_admin_statement_params(array $cohort, int $adminId): array
@@ -487,7 +488,7 @@ function cohort_public_archive(array $fallbackCohorts): array
     try {
         $rows = cohort_public_rows('is_featured DESC, sort_order ASC, COALESCE(published_at, created_at) DESC, id DESC');
 
-        $archive['items'] = array_map('cohort_public_from_row', $rows);
+        $archive['items'] = gallery_attach('cohort', array_map('cohort_public_from_row', $rows));
 
         return $archive;
     } catch (Throwable) {
@@ -522,7 +523,7 @@ function cohort_public_recent(array $fallbackCohorts, ?int $limit = null): array
             return cohort_recent_fallback($fallbackCohorts);
         }
 
-        $recent['items'] = $items;
+        $recent['items'] = gallery_attach('cohort', $items);
         $recent['total_published'] = max(cohort_public_published_count(), count($items));
         $recent['has_more'] = $recent['total_published'] > count($items);
 
@@ -562,6 +563,7 @@ function cohort_public_from_row(array $row): array
         'content' => $cohort['content'],
         'video' => $video,
         'poster' => $cohort['poster_image'],
+        'gallery' => [],
         'resource_label' => $cohort['resource_label'],
         'resource_url' => $cohort['resource_url'],
         'takeaways' => cohort_public_takeaways($cohort),
@@ -638,10 +640,19 @@ function cohort_rich_content(mixed $content): string
     }
 
     $content = preg_replace('/<(script|style|iframe|object|embed)\b[^>]*>.*?<\/\1>/is', '', $content) ?? '';
-    $allowedTags = '<p><h2><h3><h4><strong><b><em><i><ul><ol><li><blockquote><a><br>';
+
+    // Pasted content (browsers, Word, Google Docs) uses <div> for line breaks and
+    // wraps runs in <span>/<font>. Promote the divs to paragraphs before the
+    // allow-list runs, otherwise strip_tags would drop them and collapse every
+    // line into one block — the exact problem this field had.
+    $content = preg_replace('/<div\b([^>]*)>/i', '<p$1>', $content) ?? $content;
+    $content = preg_replace('#</div\s*>#i', '</p>', $content) ?? $content;
+
+    $allowedTags = '<p><h2><h3><h4><strong><b><em><i><u><ul><ol><li><blockquote><a><br>';
     $clean = strip_tags($content, $allowedTags);
     $clean = preg_replace_callback('/<([a-z][a-z0-9]*)(\s[^>]*)?>/i', static function (array $matches): string {
         $tag = strtolower($matches[1]);
+        $attributes = (string) ($matches[2] ?? '');
 
         if ($tag === 'b') {
             return '<strong>';
@@ -656,10 +667,17 @@ function cohort_rich_content(mixed $content): string
         }
 
         if ($tag !== 'a') {
+            // Alignment is the one piece of styling worth keeping, and only from
+            // a fixed set of values — never a free-form style attribute.
+            $align = cohort_content_text_align($attributes);
+
+            if ($align !== '' && in_array($tag, ['p', 'h2', 'h3', 'h4', 'li', 'blockquote', 'ul', 'ol'], true)) {
+                return '<' . $tag . ' style="text-align:' . $align . '">';
+            }
+
             return '<' . $tag . '>';
         }
 
-        $attributes = (string) ($matches[2] ?? '');
         $href = '';
 
         if (preg_match('/\shref\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s>]+))/i', $attributes, $hrefMatch) === 1) {
@@ -675,9 +693,98 @@ function cohort_rich_content(mixed $content): string
         return '<a href="' . e($href) . '"' . $externalAttrs . '>';
     }, $clean) ?? '';
     $clean = str_replace(['</b>', '</i>'], ['</strong>', '</em>'], $clean);
-    $clean = preg_replace('/<p>\s*<\/p>/i', '', $clean) ?? $clean;
+    $clean = cohort_rich_content_normalize($clean);
+    // Drop blocks the editor leaves behind that hold nothing but a line break.
+    $clean = preg_replace('#<(p|h2|h3|h4)>(?:\s|<br\s*/?>|&nbsp;)*</\1>#i', '', $clean) ?? $clean;
+    $clean = trim($clean);
 
-    return trim($clean);
+    // Formatting with no words in it is the same as no content, so callers can
+    // keep using a plain `=== ''` check.
+    return cohort_rich_content_text($clean) === '' ? '' : $clean;
+}
+
+/**
+ * Fix up structurally invalid markup, mainly paragraphs nested inside
+ * paragraphs — what promoting nested <div>s to <p> produces. The HTML parser
+ * closes those the way a browser would, so what is stored matches what renders.
+ * Falls back to the input untouched if ext-dom is unavailable.
+ */
+function cohort_rich_content_normalize(string $html): string
+{
+    if ($html === '' || ! class_exists('DOMDocument')) {
+        return $html;
+    }
+
+    $document = new DOMDocument();
+    $previous = libxml_use_internal_errors(true);
+
+    $loaded = $document->loadHTML(
+        '<?xml encoding="UTF-8"?><body>' . $html . '</body>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+    );
+
+    libxml_clear_errors();
+    libxml_use_internal_errors($previous);
+
+    if (! $loaded) {
+        return $html;
+    }
+
+    $body = $document->getElementsByTagName('body')->item(0);
+
+    if ($body === null) {
+        return $html;
+    }
+
+    $normalized = '';
+
+    foreach ($body->childNodes as $child) {
+        $normalized .= $document->saveHTML($child);
+    }
+
+    return trim($normalized) !== '' ? trim($normalized) : $html;
+}
+
+/**
+ * Pull a safe alignment value out of a tag's attributes, from a fixed set.
+ */
+function cohort_content_text_align(string $attributes): string
+{
+    if (preg_match('/text-align\s*:\s*(left|right|center|justify)/i', $attributes, $matches) === 1) {
+        return strtolower($matches[1]);
+    }
+
+    if (preg_match('/\salign\s*=\s*["\']?(left|right|center|justify)/i', $attributes, $matches) === 1) {
+        return strtolower($matches[1]);
+    }
+
+    return '';
+}
+
+/**
+ * A cohort/event card description as safe display HTML.
+ *
+ * Descriptions saved before this field became rich text are plain strings, and
+ * cohort_rich_content() turns those into paragraphs, so nothing that already
+ * exists changes how it looks.
+ */
+function cohort_description_html(mixed $description): string
+{
+    return cohort_rich_content($description);
+}
+
+/**
+ * The same description flattened to one line of plain text, for meta tags,
+ * schema, and anywhere markup would be wrong.
+ */
+function cohort_description_text(mixed $description): string
+{
+    $html = cohort_rich_content($description);
+    // Block boundaries are word boundaries once the tags are gone, otherwise
+    // "<h2>Head</h2><p>Body" would flatten to "HeadBody".
+    $html = preg_replace('#</(p|h2|h3|h4|li|blockquote|ul|ol)>|<br\s*/?>#i', ' ', $html) ?? $html;
+
+    return cohort_rich_content_text($html);
 }
 
 function cohort_plain_text_to_html(string $content): string

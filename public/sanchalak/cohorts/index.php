@@ -48,6 +48,18 @@ try {
 
                     if ($errors === []) {
                         $savedId = cohort_admin_save($form, (int) $admin['id']);
+
+                        // Gallery work runs after the save so a brand-new cohort
+                        // already has the id its photo folder is named after.
+                        $galleryErrors = [];
+                        gallery_save_from_post('cohort', $savedId, $_POST, (int) $admin['id'], $galleryErrors);
+                        $uploaded = upload_gallery_photos('gallery_upload', 'cohort', $savedId, $galleryErrors);
+                        gallery_add_photos('cohort', $savedId, $uploaded, (int) $admin['id']);
+
+                        if ($galleryErrors !== []) {
+                            flash('error', implode(' ', $galleryErrors));
+                        }
+
                         flash('success', $id > 0 ? 'Cohort updated.' : 'Cohort created.');
                         redirect(admin_cohorts_url(['edit' => $savedId]));
                     }
@@ -75,6 +87,13 @@ try {
     $errors[] = 'The cohorts table is not ready. Run php scripts/migrate.php from the portfolio folder.';
 }
 
+$galleryPhotos = gallery_photos_for('cohort', isset($form['id']) ? (int) $form['id'] : null);
+$flashedError = flash('error');
+
+if ($flashedError !== null) {
+    $errors[] = $flashedError;
+}
+
 render('admin/cohorts', [
     'admin' => $admin,
     'cohorts' => $cohorts,
@@ -83,6 +102,7 @@ render('admin/cohorts', [
     'form' => $form,
     'editing' => $editing,
     'pageContent' => $pageContent,
+    'galleryPhotos' => $galleryPhotos,
     'errors' => $errors,
     'success' => flash('success'),
     'pageTitle' => 'Cohorts',
