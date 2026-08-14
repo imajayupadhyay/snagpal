@@ -64,6 +64,12 @@
         <p>Publish upcoming and past events with dates, location, video, and registration links.</p>
         <span class="go">Manage events &rarr;</span>
       </a>
+      <a class="launch-card" href="<?= e(admin_event_registrations_url()) ?>">
+        <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4.5" width="16" height="15.5" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="M16.5 15.5 18 17l2.5-3"/></svg></span>
+        <h2>Event Registrations</h2>
+        <p>View name, email, and phone submissions from the public upcoming-event registration form.</p>
+        <span class="go">View registrations &rarr;</span>
+      </a>
       <a class="launch-card" href="<?= e(admin_schedule_url()) ?>">
         <span class="launch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg></span>
         <h2>Schedule</h2>

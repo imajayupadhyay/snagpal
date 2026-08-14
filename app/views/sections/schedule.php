@@ -3,11 +3,16 @@ $identity = $site['identity'];
 $schedule = $site['schedule'];
 $email = $identity['email'];
 $mailto = 'mailto:' . $email . '?subject=' . rawurlencode($schedule['email_subject']);
+$ctaLabel = trim((string) ($schedule['cta_label'] ?? ''));
+$ctaLabel = $ctaLabel !== '' ? $ctaLabel : 'Request a meeting slot';
 ?>
 <section id="schedule" class="schedule">
   <div class="head" style="margin-bottom:0"><span class="mono"><?= e($schedule['eyebrow']) ?></span></div>
   <p class="sub reveal d1"><?= e($schedule['description']) ?></p>
-  <a class="connect" href="<?= e($mailto) ?>"><?= e($email) ?> &rarr;</a>
+  <div class="schedule-actions reveal d2">
+    <button class="cta schedule-cta" type="button" data-schedule-open><?= e($ctaLabel) ?></button>
+    <a class="connect" href="<?= e($mailto) ?>"><?= e($email) ?> &rarr;</a>
+  </div>
   <div class="row reveal d2">
     <div class="it"><div class="k">Connect</div><div class="v"><a href="mailto:<?= e($email) ?>"><?= e($email) ?></a></div></div>
     <div class="it"><div class="k">LinkedIn</div><div class="v"><a href="<?= e($identity['linkedin']['url']) ?>" target="_blank" rel="noopener"><?= e($identity['linkedin']['label']) ?> &nearr;</a></div></div>

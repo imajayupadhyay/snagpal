@@ -91,6 +91,11 @@ function admin_events_url(array $query = []): string
     return $query === [] ? $url : $url . '?' . http_build_query($query);
 }
 
+function admin_event_registrations_url(): string
+{
+    return url_path('sanchalak/event-registrations/');
+}
+
 function admin_about_url(): string
 {
     return url_path('sanchalak/about/');

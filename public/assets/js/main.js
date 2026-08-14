@@ -470,6 +470,133 @@
     }
   }
 
+  /* upcoming event registration modal */
+  var eventRegModal=document.getElementById('eventRegistrationModal');
+  if(eventRegModal){
+    var eventRegOpeners=document.querySelectorAll('[data-event-registration-open]');
+    var eventRegClosers=eventRegModal.querySelectorAll('[data-event-registration-close]');
+    var eventRegDialog=eventRegModal.querySelector('.meeting-dialog');
+    var eventRegForm=eventRegModal.querySelector('#eventRegistrationForm');
+    var eventRegAlert=eventRegModal.querySelector('[data-event-registration-alert]');
+    var eventRegSubmit=eventRegForm?eventRegForm.querySelector('.meeting-submit'):null;
+    var eventRegLastFocus=null;
+
+    function showEventRegMessage(type,messages){
+      if(!eventRegAlert){
+        return;
+      }
+
+      var list=Array.isArray(messages)?messages:[messages];
+      eventRegAlert.className='meeting-alert '+(type==='success'?'success':'error');
+      eventRegAlert.setAttribute('role',type==='success'?'status':'alert');
+      eventRegAlert.innerHTML=list.map(function(message){return '<p>'+esc(message||'Unable to complete the registration.')+'</p>';}).join('');
+      eventRegAlert.hidden=false;
+    }
+
+    function setEventRegSubmitting(isSubmitting){
+      if(!eventRegSubmit){
+        return;
+      }
+
+      if(isSubmitting){
+        eventRegSubmit.dataset.label=eventRegSubmit.textContent;
+        eventRegSubmit.textContent='Submitting...';
+        eventRegSubmit.disabled=true;
+        return;
+      }
+
+      eventRegSubmit.textContent=eventRegSubmit.dataset.label||'Submit Registration';
+      eventRegSubmit.disabled=false;
+    }
+
+    function openEventRegModal(){
+      eventRegLastFocus=document.activeElement;
+      eventRegModal.hidden=false;
+      eventRegModal.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-open');
+      setTimeout(function(){
+        var target=eventRegModal.querySelector('input:not([type="hidden"]):not(.hp-field),select,textarea,button');
+        if(target){target.focus();}
+      },30);
+    }
+
+    function closeEventRegModal(){
+      eventRegModal.hidden=true;
+      eventRegModal.setAttribute('aria-hidden','true');
+      document.body.classList.remove('modal-open');
+      if(eventRegLastFocus&&typeof eventRegLastFocus.focus==='function'){
+        eventRegLastFocus.focus();
+      }
+    }
+
+    eventRegOpeners.forEach(function(opener){
+      opener.addEventListener('click',function(event){
+        event.preventDefault();
+        openEventRegModal();
+      });
+    });
+
+    eventRegClosers.forEach(function(closer){
+      closer.addEventListener('click',closeEventRegModal);
+    });
+
+    document.addEventListener('keydown',function(event){
+      if(event.key==='Escape'&&!eventRegModal.hidden){
+        closeEventRegModal();
+      }
+    });
+
+    if(eventRegDialog){
+      eventRegDialog.addEventListener('click',function(event){
+        event.stopPropagation();
+      });
+    }
+
+    if(eventRegForm&&window.fetch){
+      eventRegForm.addEventListener('submit',function(event){
+        event.preventDefault();
+
+        setEventRegSubmitting(true);
+
+        fetch(eventRegForm.action,{
+          method:'POST',
+          body:new FormData(eventRegForm),
+          headers:{
+            'Accept':'application/json',
+            'X-Requested-With':'XMLHttpRequest'
+          },
+          credentials:'same-origin'
+        })
+          .then(function(response){
+            return response.json().then(function(payload){
+              payload.httpOk=response.ok;
+              return payload;
+            });
+          })
+          .then(function(payload){
+            if(payload.ok){
+              showEventRegMessage('success',[payload.message||'Thank you. Your registration has been received.']);
+              eventRegForm.reset();
+              if(eventRegAlert){eventRegAlert.focus&&eventRegAlert.focus();}
+              return;
+            }
+
+            showEventRegMessage('error',payload.errors||['Unable to submit your registration. Please try again.']);
+          })
+          .catch(function(){
+            showEventRegMessage('error',['Unable to submit without refreshing. Please try again.']);
+          })
+          .finally(function(){
+            setEventRegSubmitting(false);
+          });
+      });
+    }
+
+    if(eventRegModal.getAttribute('data-auto-open')==='true'){
+      openEventRegModal();
+    }
+  }
+
   /* cohort category tabs */
   var cohortTabs=document.querySelector('[data-cohort-tabs]');
   var cohortGrid=document.querySelector('[data-cohort-grid]');

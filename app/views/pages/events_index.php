@@ -36,9 +36,12 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
   </header>
 
   <section class="events-section" id="upcoming-events">
-    <div class="head events-head">
-      <h2>Upcoming Events</h2>
-      <span class="rule reveal"></span>
+    <div class="head events-head events-head-with-action">
+      <div class="events-head-copy">
+        <h2>Upcoming Events</h2>
+        <span class="rule reveal"></span>
+      </div>
+      <button class="cta events-register-btn reveal d1" type="button" data-event-registration-open>Register for Upcoming Event</button>
     </div>
     <?php if ($upcoming === []): ?>
       <p class="events-empty reveal">No upcoming events have been published yet.</p>

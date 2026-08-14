@@ -27,6 +27,7 @@ require APP_PATH . '/gallery.php';
 require APP_PATH . '/cohorts.php';
 require APP_PATH . '/cohort_categories.php';
 require APP_PATH . '/events.php';
+require APP_PATH . '/event_registrations.php';
 require APP_PATH . '/about_page.php';
 require APP_PATH . '/awards_page.php';
 require APP_PATH . '/recommendations.php';

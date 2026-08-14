@@ -213,6 +213,7 @@ function admin_notification_type_label(string $type): string
     return match ($type) {
         'booking_pending' => 'Booking',
         'recommendation_pending' => 'Recommendation',
+        'event_registration' => 'Event',
         default => 'Notice',
     };
 }
