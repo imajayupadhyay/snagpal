@@ -17,6 +17,17 @@ $phoneHref = static function (mixed $value): string {
     return $phone !== '' ? 'tel:' . $phone : '';
 };
 
+$eventLabel = static function (array $registration): string {
+    $title = trim((string) ($registration['event_title'] ?? ''));
+    $date = trim((string) ($registration['event_date_label'] ?? ''));
+
+    if ($title === '') {
+        return 'Not recorded';
+    }
+
+    return $date !== '' ? $title . ' - ' . $date : $title;
+};
+
 ob_start();
 ?>
 <div class="dashboard-shell">
@@ -85,6 +96,7 @@ ob_start();
           <table class="admin-table">
             <thead>
               <tr>
+                <th>Event</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -96,6 +108,7 @@ ob_start();
               <?php foreach ($registrations as $registration): ?>
                 <?php $tel = $phoneHref($registration['phone'] ?? ''); ?>
                 <tr>
+                  <td><strong><?= e($eventLabel($registration)) ?></strong></td>
                   <td><strong><?= e($registration['name'] ?? '') ?></strong></td>
                   <td><a href="mailto:<?= e($registration['email'] ?? '') ?>"><?= e($registration['email'] ?? '') ?></a></td>
                   <td>

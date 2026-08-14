@@ -478,6 +478,7 @@
     var eventRegDialog=eventRegModal.querySelector('.meeting-dialog');
     var eventRegForm=eventRegModal.querySelector('#eventRegistrationForm');
     var eventRegAlert=eventRegModal.querySelector('[data-event-registration-alert]');
+    var eventRegEventSelect=eventRegForm?eventRegForm.querySelector('select[name="event_id"]'):null;
     var eventRegSubmit=eventRegForm?eventRegForm.querySelector('.meeting-submit'):null;
     var eventRegLastFocus=null;
 
@@ -509,13 +510,44 @@
       eventRegSubmit.disabled=false;
     }
 
-    function openEventRegModal(){
+    function eventRegSelectEvent(eventId){
+      if(!eventRegEventSelect){
+        return false;
+      }
+
+      var selectedId=(eventId||'').toString();
+
+      if(!selectedId){
+        eventRegEventSelect.value='';
+        return false;
+      }
+
+      for(var i=0;i<eventRegEventSelect.options.length;i++){
+        if(eventRegEventSelect.options[i].value===selectedId){
+          eventRegEventSelect.value=selectedId;
+          return true;
+        }
+      }
+
+      eventRegEventSelect.value='';
+      return false;
+    }
+
+    function openEventRegModal(selectedEventId){
       eventRegLastFocus=document.activeElement;
+      var hasSelectedEvent=arguments.length>0
+        ? eventRegSelectEvent(selectedEventId)
+        : !!(eventRegEventSelect&&eventRegEventSelect.value);
       eventRegModal.hidden=false;
       eventRegModal.setAttribute('aria-hidden','false');
       document.body.classList.add('modal-open');
       setTimeout(function(){
-        var target=eventRegModal.querySelector('input:not([type="hidden"]):not(.hp-field),select,textarea,button');
+        var target=hasSelectedEvent&&eventRegForm
+          ? eventRegForm.querySelector('input[name="name"]')
+          : eventRegEventSelect;
+        if(!target){
+          target=eventRegModal.querySelector('input:not([type="hidden"]):not(.hp-field),select,textarea,button');
+        }
         if(target){target.focus();}
       },30);
     }
@@ -532,7 +564,7 @@
     eventRegOpeners.forEach(function(opener){
       opener.addEventListener('click',function(event){
         event.preventDefault();
-        openEventRegModal();
+        openEventRegModal(opener.getAttribute('data-event-registration-event-id')||'');
       });
     });
 

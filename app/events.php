@@ -402,6 +402,75 @@ function event_public_archive(array $fallbackEvents): array
     return $archive;
 }
 
+function event_public_upcoming_options(): array
+{
+    try {
+        $today = (new DateTimeImmutable('today'))->format('Y-m-d');
+        $statement = db()->prepare(
+            'SELECT id, title, event_date, event_time_label, location, sort_order
+             FROM events
+             WHERE status = "published"
+                AND (event_date IS NULL OR event_date >= :today)
+             ORDER BY sort_order ASC, COALESCE(event_date, "9999-12-31") ASC, id DESC'
+        );
+        $statement->execute(['today' => $today]);
+
+        return array_values(array_filter(array_map('event_public_option_from_row', $statement->fetchAll())));
+    } catch (Throwable) {
+        return [];
+    }
+}
+
+function event_public_find_upcoming_option(int $id): ?array
+{
+    if ($id <= 0) {
+        return null;
+    }
+
+    try {
+        $statement = db()->prepare(
+            'SELECT id, title, event_date, event_time_label, location, sort_order
+             FROM events
+             WHERE id = :id AND status = "published"
+             LIMIT 1'
+        );
+        $statement->execute(['id' => $id]);
+        $row = $statement->fetch();
+
+        if (! is_array($row)) {
+            return null;
+        }
+
+        $option = event_public_option_from_row($row);
+
+        if ($option === null || event_public_bucket((string) $option['event_date']) !== 'upcoming') {
+            return null;
+        }
+
+        return $option;
+    } catch (Throwable) {
+        return null;
+    }
+}
+
+function event_public_option_from_row(array $row): ?array
+{
+    $event = event_admin_normalize($row);
+
+    if (empty($event['id']) || $event['title'] === '') {
+        return null;
+    }
+
+    return [
+        'id' => (int) $event['id'],
+        'title' => $event['title'],
+        'date_label' => event_public_date_label((string) $event['event_date'], (string) $event['event_time_label']),
+        'location' => $event['location'],
+        'event_date' => $event['event_date'],
+        'sort_order' => $event['sort_order'],
+    ];
+}
+
 function event_public_from_row(array $row): array
 {
     $event = event_admin_normalize($row);

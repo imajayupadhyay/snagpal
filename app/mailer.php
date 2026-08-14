@@ -270,9 +270,11 @@ function email_brand_name(): string
     return (string) ($site['identity']['full_name'] ?? ($GLOBALS['config']['mail']['from_name'] ?? 'Shweta Nagpal'));
 }
 
-function email_layout(string $heading, string $statusLabel, string $statusColor, string $statusBg, string $introHtml, array $rows, string $footerHtml = ''): string
+function email_layout(string $heading, string $statusLabel, string $statusColor, string $statusBg, string $introHtml, array $rows, string $footerHtml = '', array $options = []): string
 {
     $brand = e(email_brand_name());
+    $sectionLabel = e((string) ($options['section_label'] ?? 'Meetings'));
+    $footerNotice = (string) ($options['footer_notice'] ?? 'Please do not reply if you did not request a meeting.');
     $rowsHtml = '';
 
     foreach ($rows as $label => $value) {
@@ -297,7 +299,7 @@ function email_layout(string $heading, string $statusLabel, string $statusColor,
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border:1px solid rgba(20,30,27,.12);border-radius:14px;overflow:hidden;">'
         . '<tr><td style="background:#08322D;padding:22px 28px;">'
         . '<div style="font-family:\'Arial Narrow\',Arial,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;color:#FFFFFF;font-size:19px;">' . $brand . '</div>'
-        . '<div style="color:#9FB6B0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:3px;">Meetings</div>'
+        . '<div style="color:#9FB6B0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:3px;">' . $sectionLabel . '</div>'
         . '</td></tr>'
         . '<tr><td style="padding:30px 28px 8px;">'
         . ($statusPill !== '' ? '<div style="margin-bottom:14px;">' . $statusPill . '</div>' : '')
@@ -309,7 +311,7 @@ function email_layout(string $heading, string $statusLabel, string $statusColor,
         . '</td></tr>'
         . ($footerHtml !== '' ? '<tr><td style="padding:6px 28px 26px;font-size:13px;line-height:1.6;color:#39433F;">' . $footerHtml . '</td></tr>' : '<tr><td style="padding:0 0 14px;"></td></tr>')
         . '<tr><td style="background:#FAF8F2;padding:16px 28px;border-top:1px solid rgba(20,30,27,.08);color:#6C7470;font-size:11px;line-height:1.5;">'
-        . 'This message was sent automatically by ' . $brand . '. Please do not reply if you did not request a meeting.'
+        . 'This message was sent automatically by ' . $brand . '. ' . e($footerNotice)
         . '</td></tr>'
         . '</table></td></tr></table></body></html>';
 }
@@ -386,4 +388,74 @@ function notify_booking_confirmed(array $booking): void
     );
 
     send_mail($email, $name, 'Your meeting is confirmed', $html);
+}
+
+/**
+ * Notify the visitor and admin when someone registers for an upcoming event.
+ *
+ * @param array{name:string,email:string,phone:string,event_title:string,event_date_label?:string,event_location?:string,source_path?:string} $registration
+ */
+function notify_event_registration_received(array $registration): void
+{
+    $brand = email_brand_name();
+    $name = (string) $registration['name'];
+    $email = (string) $registration['email'];
+    $phone = (string) $registration['phone'];
+    $eventTitle = (string) $registration['event_title'];
+    $dateLabel = (string) ($registration['event_date_label'] ?? '');
+    $location = (string) ($registration['event_location'] ?? '');
+    $sourcePath = (string) ($registration['source_path'] ?? '');
+    $visitorLayoutOptions = [
+        'section_label' => 'Events',
+        'footer_notice' => 'Please ignore this email if you did not register for this event.',
+    ];
+    $adminLayoutOptions = [
+        'section_label' => 'Events',
+        'footer_notice' => 'This event registration came from the public Events page.',
+    ];
+
+    $visitorHtml = email_layout(
+        'Event registration received',
+        'Registered',
+        '#08322D',
+        '#E4EFEB',
+        '<p style="margin:0 0 10px;">Hi ' . e($name) . ', thank you for registering for the upcoming event: <strong>' . e($eventTitle) . '</strong>.</p>'
+            . '<p style="margin:0;">The team has received your details and will use them for event communication.</p>',
+        ['Event' => $eventTitle, 'Date / Time' => $dateLabel, 'Location' => $location],
+        '',
+        $visitorLayoutOptions
+    );
+    send_mail($email, $name, 'Registration received: ' . $eventTitle, $visitorHtml);
+
+    $cfg = mail_config();
+    $adminEmail = (string) ($cfg['admin_address'] ?? '');
+
+    if ($adminEmail === '') {
+        return;
+    }
+
+    $adminUrl = (string) ($GLOBALS['config']['url'] ?? '') . url_path('sanchalak/event-registrations/');
+    $adminHtml = email_layout(
+        'New event registration',
+        'New registration',
+        '#284A73',
+        '#E8EDF5',
+        '<p style="margin:0 0 10px;">A user has registered for the following event: <strong>' . e($eventTitle) . '</strong>.</p>'
+            . '<p style="margin:0;"><a href="' . e($adminUrl) . '" style="color:#0C5E55;font-weight:bold;">Open registrations &rarr;</a></p>',
+        [
+            'Event' => $eventTitle,
+            'Date / Time' => $dateLabel,
+            'Location' => $location,
+            'Name' => $name,
+            'Email' => $email,
+            'Phone' => $phone,
+            'Source' => $sourcePath,
+        ],
+        'Reply to this email to respond to ' . e($name) . ' directly.',
+        $adminLayoutOptions
+    );
+    send_mail($adminEmail, $brand . ' (Admin)', 'New event registration: ' . $eventTitle, $adminHtml, '', [
+        'reply_to' => $email,
+        'reply_name' => $name,
+    ]);
 }

@@ -63,9 +63,19 @@ $pageContent = is_array($site['events_page'] ?? null) ? $site['events_page'] : e
               <?php if (! empty($item['location'])): ?>
                 <div class="event-card-detail"><?= e($item['location']) ?></div>
               <?php endif; ?>
-              <?php if (! empty($item['registration_url'])): ?>
-                <a class="about-text-link event-card-cta" href="<?= e($item['registration_url']) ?>" target="_blank" rel="noopener"><?= e($item['registration_label'] ?: 'Register') ?></a>
-              <?php endif; ?>
+              <div class="event-card-actions">
+                <?php if (! empty($item['id'])): ?>
+                  <button
+                    class="cta event-card-register"
+                    type="button"
+                    data-event-registration-open
+                    data-event-registration-event-id="<?= e((string) $item['id']) ?>"
+                  >Register for Event</button>
+                <?php endif; ?>
+                <?php if (! empty($item['registration_url'])): ?>
+                  <a class="about-text-link event-card-cta" href="<?= e($item['registration_url']) ?>" target="_blank" rel="noopener"><?= e($item['registration_label'] ?: 'View link') ?></a>
+                <?php endif; ?>
+              </div>
             </div>
           </article>
         <?php endforeach; ?>

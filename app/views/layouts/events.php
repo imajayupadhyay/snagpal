@@ -2,6 +2,7 @@
 $meetingSlots = schedule_available_slots();
 $meetingFlash = public_flash('meeting_booking');
 $eventRegistrationFlash = public_flash('event_registration');
+$eventRegistrationEvents = event_public_upcoming_options();
 ?>
 <!DOCTYPE html>
 <html lang="<?= e($page['lang'] ?? 'en') ?>">
@@ -15,7 +16,7 @@ $eventRegistrationFlash = public_flash('event_registration');
 
 <?php render('partials/footer', ['site' => $site]); ?>
 <?php render('partials/meeting_modal', ['slots' => $meetingSlots, 'flash' => $meetingFlash]); ?>
-<?php render('partials/event_registration_modal', ['flash' => $eventRegistrationFlash]); ?>
+<?php render('partials/event_registration_modal', ['flash' => $eventRegistrationFlash, 'events' => $eventRegistrationEvents]); ?>
 
 <script>
 window.portfolioData = <?= json_encode([

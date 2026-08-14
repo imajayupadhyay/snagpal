@@ -718,10 +718,13 @@
   [data-theme="dark"] .event-card.is-past .event-card-meta span{color:#91ABC6}
   .event-card-meta em{font-style:normal;color:var(--muted);text-align:right}
   .event-card h3{font-family:var(--cond);font-weight:700;text-transform:uppercase;font-size:clamp(1.2rem,2.3vw,1.75rem);
-    line-height:1.06}
+    line-height:1.06;overflow-wrap:anywhere}
   .event-card p,.event-card-body>.rich-text{margin-top:auto;color:var(--muted);font-size:0.98rem;line-height:1.64;font-weight:300}
   .event-card-detail{margin-top:-0.4rem;font-family:var(--mono);font-size:0.68rem;letter-spacing:0.06em;
     text-transform:uppercase;color:var(--muted)}
+  .event-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:0.75rem 0.95rem;margin-top:0.3rem}
+  .event-card-register{min-height:44px;justify-content:center;box-shadow:0 16px 36px -26px var(--shadow);
+    white-space:nowrap;font-family:var(--mono);font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase}
   .event-card-cta{margin-top:0.3rem}
   .events-note{margin-top:clamp(1.6rem,3vw,2.2rem);font-family:var(--mono);font-size:0.66rem;letter-spacing:0.06em;
     text-transform:uppercase;color:var(--muted);line-height:1.6}
@@ -1030,6 +1033,8 @@
     .events-grid{grid-template-columns:1fr}
     .event-card-meta{align-items:flex-start;flex-direction:column;gap:0.45rem}
     .event-card-meta em{text-align:left}
+    .event-card-actions{align-items:stretch;flex-direction:column}
+    .event-card-register{width:100%;white-space:normal;text-align:center}
     .meeting-modal{padding:0.75rem}
     .meeting-dialog{max-height:92vh}
     .meeting-main{padding:1rem}

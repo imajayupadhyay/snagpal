@@ -4,6 +4,9 @@ $old = is_array($flash['old'] ?? null) ? $flash['old'] : [];
 $messages = is_array($flash['messages'] ?? null) ? $flash['messages'] : [];
 $type = in_array($flash['type'] ?? '', ['success', 'error'], true) ? (string) $flash['type'] : '';
 $autoOpen = $type !== '' || isset($_GET['event_registration']);
+$events = array_values(array_filter($events ?? [], 'is_array'));
+$hasEvents = $events !== [];
+$selectedEventId = (string) ($old['event_id'] ?? '');
 ?>
 <div
   class="meeting-modal event-registration-modal"
@@ -21,9 +24,9 @@ $autoOpen = $type !== '' || isset($_GET['event_registration']);
     <aside class="meeting-aside event-registration-aside">
       <p class="mono meeting-eyebrow">Upcoming Events</p>
       <h2 id="eventRegistrationModalTitle">Register for upcoming event</h2>
-      <p class="meeting-aside-lead">Share your contact details and the team will use them for upcoming event registration communication.</p>
+      <p class="meeting-aside-lead">Choose an event and share your contact details for upcoming event registration communication.</p>
       <ol class="meeting-steps">
-        <li><span class="meeting-step-n">1</span><span>Enter your name</span></li>
+        <li><span class="meeting-step-n">1</span><span>Select an event</span></li>
         <li><span class="meeting-step-n">2</span><span>Share email and phone</span></li>
         <li><span class="meeting-step-n">3</span><span>Submit your registration</span></li>
       </ol>
@@ -49,6 +52,26 @@ $autoOpen = $type !== '' || isset($_GET['event_registration']);
 
         <div class="meeting-grid event-registration-grid">
           <label class="full">
+            <span>Event</span>
+            <select name="event_id" required<?= $hasEvents ? '' : ' disabled' ?>>
+              <option value=""><?= $hasEvents ? 'Choose an upcoming event' : 'No upcoming events available' ?></option>
+              <?php foreach ($events as $event): ?>
+                <?php
+                $eventId = (string) ($event['id'] ?? '');
+                $eventLabel = (string) ($event['title'] ?? '');
+                $dateLabel = (string) ($event['date_label'] ?? '');
+                if ($dateLabel !== '') {
+                    $eventLabel .= ' - ' . $dateLabel;
+                }
+                ?>
+                <option value="<?= e($eventId) ?>"<?= $selectedEventId === $eventId ? ' selected' : '' ?>>
+                  <?= e($eventLabel) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+
+          <label class="full">
             <span>Name</span>
             <input name="name" value="<?= e($old['name'] ?? '') ?>" autocomplete="name" maxlength="160" required>
           </label>
@@ -64,8 +87,7 @@ $autoOpen = $type !== '' || isset($_GET['event_registration']);
           </label>
         </div>
 
-        <button class="meeting-submit" type="submit">Submit Registration</button>
-        <p class="meeting-fineprint">Only your name, email, and phone number are saved for event registration follow-up.</p>
+        <button class="meeting-submit" type="submit"<?= $hasEvents ? '' : ' disabled' ?>>Submit Registration</button>
       </form>
     </div>
   </div>

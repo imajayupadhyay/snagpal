@@ -24,6 +24,13 @@ function event_registration_current_source_path(): string
     return $path !== '' ? substr($path, 0, 255) : url_path('events/');
 }
 
+function event_registration_event_id(mixed $value): int
+{
+    $id = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+    return is_int($id) ? $id : 0;
+}
+
 function event_registration_submit(array $post): array
 {
     $errors = [];
@@ -42,7 +49,15 @@ function event_registration_submit(array $post): array
     $name = event_registration_clean_text($post['name'] ?? '');
     $email = strtolower(event_registration_clean_text($post['email'] ?? ''));
     $phone = event_registration_clean_text($post['phone'] ?? '');
+    $eventId = event_registration_event_id($post['event_id'] ?? null);
+    $selectedEvent = $eventId > 0 ? event_public_find_upcoming_option($eventId) : null;
     $digits = preg_replace('/\D+/', '', $phone) ?? '';
+
+    if ($eventId <= 0) {
+        $errors[] = 'Please choose an upcoming event.';
+    } elseif ($selectedEvent === null) {
+        $errors[] = 'That event is no longer available for registration. Please choose another upcoming event.';
+    }
 
     if (mb_strlen($name) < 2 || mb_strlen($name) > 160) {
         $errors[] = 'Please enter your name.';
@@ -63,6 +78,7 @@ function event_registration_submit(array $post): array
     }
 
     $old = [
+        'event_id' => $eventId > 0 ? (string) $eventId : '',
         'name' => $name,
         'email' => $email,
         'phone' => $phone,
@@ -72,16 +88,24 @@ function event_registration_submit(array $post): array
         return ['ok' => false, 'errors' => $errors, 'old' => $old];
     }
 
+    $eventTitle = (string) ($selectedEvent['title'] ?? '');
+    $eventDateLabel = (string) ($selectedEvent['date_label'] ?? '');
+    $eventLocation = (string) ($selectedEvent['location'] ?? '');
+    $sourcePath = event_registration_current_source_path();
+
     try {
         $statement = db()->prepare(
-            'INSERT INTO event_registrations (name, email, phone, source_path, user_agent)
-             VALUES (:name, :email, :phone, :source_path, :user_agent)'
+            'INSERT INTO event_registrations (event_id, event_title, event_date_label, name, email, phone, source_path, user_agent)
+             VALUES (:event_id, :event_title, :event_date_label, :name, :email, :phone, :source_path, :user_agent)'
         );
         $statement->execute([
+            'event_id' => $eventId,
+            'event_title' => $eventTitle,
+            'event_date_label' => $eventDateLabel !== '' ? $eventDateLabel : null,
             'name' => $name,
             'email' => $email,
             'phone' => $phone,
-            'source_path' => event_registration_current_source_path(),
+            'source_path' => $sourcePath,
             'user_agent' => substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500) ?: null,
         ]);
         $registrationId = (int) db()->lastInsertId();
@@ -97,12 +121,26 @@ function event_registration_submit(array $post): array
         'type' => 'event_registration',
         'severity' => 'info',
         'title' => 'New event registration',
-        'body' => $name . ' registered interest in an upcoming event.',
+        'body' => $name . ' registered for ' . $eventTitle . '.',
         'action_label' => 'Open registrations',
         'action_url' => url_path('sanchalak/event-registrations/'),
         'source_type' => 'event_registration',
         'source_id' => $registrationId,
     ]);
+
+    try {
+        notify_event_registration_received([
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'event_title' => $eventTitle,
+            'event_date_label' => $eventDateLabel,
+            'event_location' => $eventLocation,
+            'source_path' => $sourcePath,
+        ]);
+    } catch (Throwable $mailException) {
+        error_log('[event-registration] emails failed: ' . $mailException->getMessage());
+    }
 
     return [
         'ok' => true,
@@ -113,7 +151,7 @@ function event_registration_submit(array $post): array
 function event_registration_admin_all(): array
 {
     return db()->query(
-        'SELECT id, name, email, phone, source_path, created_at
+        'SELECT id, event_id, event_title, event_date_label, name, email, phone, source_path, created_at
          FROM event_registrations
          ORDER BY created_at DESC, id DESC'
     )->fetchAll();
