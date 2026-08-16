@@ -73,6 +73,19 @@ function recommendation_public_social_url(mixed $value): string
     return recommendation_social_url_error($url) === null ? $url : '';
 }
 
+function recommendation_frontend_items(array $items): array
+{
+    return array_map(static function (array $item): array {
+        $photo = trim((string) ($item['photo'] ?? ''));
+
+        if ($photo !== '' && empty($item['photo_url'])) {
+            $item['photo_url'] = asset($photo);
+        }
+
+        return $item;
+    }, $items);
+}
+
 function recommendation_submit(array $post, array $files = []): array
 {
     $errors = [];

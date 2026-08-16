@@ -17,7 +17,25 @@
     {q:"Translates national AI policy into something teams can actually implement and stand behind.",w:"Programme Director, e-Governance"}
   ];
   var mq=document.getElementById('marquee');
-  function card(r){return '<figure class="rec"><p>'+esc(r.q)+'</p><figcaption class="who">'+esc(r.w)+'</figcaption></figure>';}
+  function recPhotoUrl(r){
+    var src=String((r&&(r.photo_url||r.photo))||'').trim();
+    if(!src){return '';}
+    if(/^(https?:)?\/\//i.test(src)||src.charAt(0)==='/'){return src;}
+    return '/'+src.replace(/^\/+/,'');
+  }
+  function recSocialUrl(r){
+    var href=String((r&&r.social_url)||'').trim();
+    return /^https?:\/\//i.test(href)?href:'';
+  }
+  function card(r){
+    var photo=recPhotoUrl(r);
+    var social=recSocialUrl(r);
+    var socialIcon='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9M12 3C9.6 5.5 8.4 8.5 8.4 12s1.2 6.5 3.6 9"></path></svg>';
+    return '<figure class="rec'+(photo?' has-photo':'')+(social?' has-social':'')+'"><p>'+esc(r.q)+'</p><figcaption class="who">'+esc(r.w)+'</figcaption>'+
+      (social?'<a class="rec-social" href="'+esc(social)+'" target="_blank" rel="noopener" aria-label="Open social profile">'+socialIcon+'</a>':'')+
+      (photo?'<img class="rec-photo" src="'+esc(photo)+'" alt="'+esc('Photo of '+(r.w||'recommendation author'))+'" loading="lazy" decoding="async">':'')+
+      '</figure>';
+  }
   if(mq){mq.innerHTML=(recs.map(card).join(''))+(recs.map(card).join(''));} // duplicate for loop
 
   /* topic ticker — site focus areas, duplicated for a seamless loop */

@@ -17,7 +17,7 @@ $meetingFlash = public_flash('meeting_booking');
 
 <script>
 window.portfolioData = <?= json_encode([
-    'recommendations' => $site['recommendations'],
+    'recommendations' => recommendation_frontend_items($site['recommendations']),
     'topics' => $site['topics'],
     'quotes' => $site['quotes'],
     'meetingSlots' => $meetingSlots,

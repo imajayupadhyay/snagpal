@@ -20,7 +20,7 @@ $eventRegistrationEvents = event_public_upcoming_options();
 
 <script>
 window.portfolioData = <?= json_encode([
-    'recommendations' => $site['recommendations'],
+    'recommendations' => recommendation_frontend_items($site['recommendations']),
     'topics' => $site['topics'],
     'quotes' => $site['quotes'],
     'meetingSlots' => $meetingSlots,

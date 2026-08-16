@@ -28,7 +28,7 @@ $recommendationFlash = public_flash('recommendation_submission');
 
 <script>
 window.portfolioData = <?= json_encode([
-    'recommendations' => $site['recommendations'],
+    'recommendations' => recommendation_frontend_items($site['recommendations']),
     'topics' => $site['topics'],
     'quotes' => $site['quotes'],
     'meetingSlots' => $meetingSlots,
