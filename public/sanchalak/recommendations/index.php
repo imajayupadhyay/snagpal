@@ -35,7 +35,7 @@ try {
                     redirect(admin_recommendations_url());
                 }
             } elseif ($action === 'delete') {
-                $errors = recommendation_admin_delete($id);
+                $errors = recommendation_admin_delete($id, (int) $admin['id']);
 
                 if ($errors === []) {
                     admin_notification_mark_source_read('recommendation_submission', $id, (int) $admin['id']);

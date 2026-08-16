@@ -73,6 +73,84 @@ function recommendation_public_social_url(mixed $value): string
     return recommendation_social_url_error($url) === null ? $url : '';
 }
 
+/**
+ * Keys carried on a published recommendation entry that are not edited as plain
+ * text columns in the page editors. They must survive an editor save, otherwise
+ * the link back to the submission (and the photo/social link) is lost.
+ */
+function recommendation_entry_meta_fields(): array
+{
+    return ['src_id', 'photo', 'social_url'];
+}
+
+function recommendation_entry_matches(array $entry, int $id, ?array $submission, bool $allowTextMatch): bool
+{
+    if (isset($entry['src_id']) && $entry['src_id'] !== '') {
+        return (int) $entry['src_id'] === $id;
+    }
+
+    if (! $allowTextMatch || $submission === null) {
+        return false;
+    }
+
+    // Entries published before src_id existed carry no link, so fall back to an
+    // exact quote + attribution match against the submission they came from.
+    $name = (string) ($submission['name'] ?? '');
+    $designation = (string) ($submission['designation'] ?? '');
+    $who = trim($name . ($designation !== '' ? ', ' . $designation : ''));
+
+    return recommendation_clean_multiline($entry['q'] ?? '') === recommendation_clean_multiline($submission['quote'] ?? '')
+        && recommendation_clean_text($entry['w'] ?? '') === recommendation_clean_text($who);
+}
+
+function recommendation_reject_entries(array $entries, int $id, ?array $submission, bool $allowTextMatch): array
+{
+    return array_values(array_filter($entries, static function (mixed $entry) use ($id, $submission, $allowTextMatch): bool {
+        return ! is_array($entry) || ! recommendation_entry_matches($entry, $id, $submission, $allowTextMatch);
+    }));
+}
+
+/**
+ * Publishing copies a submission into the homepage / About page content, so
+ * removing the submission must also retract those copies. Without this the
+ * quote keeps rendering after the submission row is gone.
+ */
+function recommendation_remove_published(int $id, ?array $submission = null, ?int $adminId = null): void
+{
+    if ($id <= 0) {
+        return;
+    }
+
+    $allowHomepageTextMatch = $submission !== null && (int) ($submission['added_to_homepage'] ?? 0) === 1;
+    $allowAboutTextMatch = $submission !== null && (int) ($submission['added_to_about'] ?? 0) === 1;
+
+    try {
+        $homepage = homepage_content();
+        $current = is_array($homepage['recommendations'] ?? null) ? $homepage['recommendations'] : [];
+        $filtered = recommendation_reject_entries($current, $id, $submission, $allowHomepageTextMatch);
+
+        if (count($filtered) !== count($current)) {
+            $homepage['recommendations'] = $filtered;
+            homepage_save_content($homepage, $adminId);
+        }
+    } catch (Throwable) {
+        // A failure here must not block the delete/reject itself.
+    }
+
+    try {
+        $about = about_page_content();
+        $current = is_array($about['recommendations'] ?? null) ? $about['recommendations'] : [];
+        $filtered = recommendation_reject_entries($current, $id, $submission, $allowAboutTextMatch);
+
+        if (count($filtered) !== count($current)) {
+            $about['recommendations'] = $filtered;
+            about_page_save_content($about, $adminId);
+        }
+    } catch (Throwable) {
+        // As above.
+    }
+}
+
 function recommendation_frontend_items(array $items): array
 {
     return array_map(static function (array $item): array {
@@ -81,6 +159,9 @@ function recommendation_frontend_items(array $items): array
         if ($photo !== '' && empty($item['photo_url'])) {
             $item['photo_url'] = asset($photo);
         }
+
+        // Internal bookkeeping only — no reason to publish it to the page.
+        unset($item['src_id']);
 
         return $item;
     }, $items);
@@ -256,6 +337,9 @@ function recommendation_admin_publish(int $id, string $target, int $adminId): ar
     $entry = [
         'q' => (string) $submission['quote'],
         'w' => trim($name . ($designation !== '' ? ', ' . $designation : '')),
+        // Links the published copy back to its submission so deleting or
+        // rejecting the submission can retract it again.
+        'src_id' => $id,
     ];
     $photoPath = trim((string) ($submission['photo_path'] ?? ''));
     $socialUrl = recommendation_public_social_url($submission['social_url'] ?? '');
@@ -273,6 +357,10 @@ function recommendation_admin_publish(int $id, string $target, int $adminId): ar
 
     if ($target === 'homepage' || $target === 'both') {
         $homepage = homepage_content();
+        $current = is_array($homepage['recommendations'] ?? null) ? $homepage['recommendations'] : [];
+        // Drop any earlier copy of this submission so re-publishing updates it
+        // in place instead of appending a duplicate.
+        $homepage['recommendations'] = recommendation_reject_entries($current, $id, $submission, $addedToHomepage === 1);
         $homepage['recommendations'][] = $entry;
         homepage_save_content($homepage, $adminId);
         $addedToHomepage = 1;
@@ -280,6 +368,8 @@ function recommendation_admin_publish(int $id, string $target, int $adminId): ar
 
     if ($target === 'about' || $target === 'both') {
         $about = about_page_content();
+        $current = is_array($about['recommendations'] ?? null) ? $about['recommendations'] : [];
+        $about['recommendations'] = recommendation_reject_entries($current, $id, $submission, $addedToAbout === 1);
         $about['recommendations'][] = $entry;
         about_page_save_content($about, $adminId);
         $addedToAbout = 1;
@@ -307,24 +397,44 @@ function recommendation_admin_reject(int $id, int $adminId): array
         return ['Invalid submission selected.'];
     }
 
+    $submission = recommendation_admin_find($id);
+
     $statement = db()->prepare(
         'UPDATE recommendation_submissions
-         SET status = "rejected", reviewed_by = :reviewed_by, reviewed_at = NOW()
+         SET status = "rejected", added_to_homepage = 0, added_to_about = 0,
+             reviewed_by = :reviewed_by, reviewed_at = NOW()
          WHERE id = :id'
     );
     $statement->execute(['reviewed_by' => $adminId, 'id' => $id]);
 
-    return $statement->rowCount() > 0 ? [] : ['That submission no longer exists.'];
+    if ($statement->rowCount() === 0) {
+        return ['That submission no longer exists.'];
+    }
+
+    // Rejecting an already-approved recommendation must also pull it off the
+    // public pages it was published to.
+    recommendation_remove_published($id, $submission, $adminId);
+
+    return [];
 }
 
-function recommendation_admin_delete(int $id): array
+function recommendation_admin_delete(int $id, ?int $adminId = null): array
 {
     if ($id <= 0) {
         return ['Invalid submission selected.'];
     }
 
+    // Read before deleting: the legacy text-match fallback needs the row.
+    $submission = recommendation_admin_find($id);
+
     $statement = db()->prepare('DELETE FROM recommendation_submissions WHERE id = :id LIMIT 1');
     $statement->execute(['id' => $id]);
 
-    return $statement->rowCount() > 0 ? [] : ['That submission no longer exists.'];
+    if ($statement->rowCount() === 0) {
+        return ['That submission no longer exists.'];
+    }
+
+    recommendation_remove_published($id, $submission, $adminId);
+
+    return [];
 }

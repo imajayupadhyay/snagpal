@@ -150,7 +150,7 @@ function homepage_content_from_post(array $post, array $current): array
             'stats' => homepage_rows_from_columns($post['hero_stats'] ?? [], ['value', 'label'], ['value', 'label']),
         ],
         'topics' => homepage_lines($post['topics_text'] ?? ''),
-        'recommendations' => homepage_rows_from_columns($post['recommendations'] ?? [], ['q', 'w'], ['q', 'w']),
+        'recommendations' => homepage_rows_from_columns($post['recommendations'] ?? [], ['q', 'w'], ['q', 'w'], recommendation_entry_meta_fields()),
         'recommendations_note' => homepage_text($post['recommendations_note'] ?? ''),
         'profile' => [
             'heading' => homepage_text($post['profile']['heading'] ?? ''),
@@ -193,7 +193,12 @@ function homepage_content_from_post(array $post, array $current): array
     ];
 }
 
-function homepage_rows_from_columns(array $columns, array $fields, array $requiredFields): array
+/**
+ * $preserveFields are carried through untouched from hidden inputs (e.g. a
+ * published recommendation's src_id / photo / social_url). They never make a
+ * row count as non-empty, and are omitted when blank.
+ */
+function homepage_rows_from_columns(array $columns, array $fields, array $requiredFields, array $preserveFields = []): array
 {
     $max = 0;
 
@@ -217,6 +222,14 @@ function homepage_rows_from_columns(array $columns, array $fields, array $requir
 
             if (in_array($field, $requiredFields, true) && $value !== '') {
                 $hasRequiredValue = true;
+            }
+        }
+
+        foreach ($preserveFields as $field) {
+            $value = homepage_text($columns[$field][$i] ?? '');
+
+            if ($value !== '') {
+                $row[$field] = $value;
             }
         }
 

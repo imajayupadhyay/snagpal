@@ -148,6 +148,11 @@ ob_start();
             <div class="repeat-row two-col">
               <textarea name="recommendations[q][]" rows="2" placeholder="Quote"><?= e($item['q'] ?? '') ?></textarea>
               <input name="recommendations[w][]" placeholder="Who (e.g. Chief Engineer, Power Utility)" value="<?= e($item['w'] ?? '') ?>" maxlength="120">
+              <?php // Carried through so a save does not strip the link to the submission, the photo, or the social link.
+                    // Always rendered, including for blank rows, to keep these arrays aligned with the q/w arrays. ?>
+              <?php foreach (recommendation_entry_meta_fields() as $metaField): ?>
+                <input type="hidden" name="recommendations[<?= e($metaField) ?>][]" value="<?= e((string) ($item[$metaField] ?? '')) ?>">
+              <?php endforeach; ?>
             </div>
           <?php endforeach; ?>
         </div>

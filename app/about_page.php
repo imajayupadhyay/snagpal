@@ -163,6 +163,17 @@ function about_page_row_fields(): array
     ];
 }
 
+/**
+ * Row keys that are not plain text columns and must pass through both the read
+ * (normalize) and save (from-post) paths untouched.
+ */
+function about_page_row_preserve_fields(): array
+{
+    return [
+        'recommendations' => recommendation_entry_meta_fields(),
+    ];
+}
+
 function about_page_content(): array
 {
     try {
@@ -242,8 +253,10 @@ function about_page_normalize(array $raw): array
     $default = about_page_default_content();
     $merged = array_merge($default, $raw);
 
+    $preserve = about_page_row_preserve_fields();
+
     foreach (about_page_row_fields() as $key => $fields) {
-        $merged[$key] = about_page_normalize_rows($raw[$key] ?? null, $default[$key], $fields);
+        $merged[$key] = about_page_normalize_rows($raw[$key] ?? null, $default[$key], $fields, $preserve[$key] ?? []);
     }
 
     $merged['profile_lead_html'] = homepage_rich_text($raw['profile_lead_html'] ?? $default['profile_lead_html']);
@@ -254,7 +267,7 @@ function about_page_normalize(array $raw): array
     return $merged;
 }
 
-function about_page_normalize_rows(mixed $rows, array $default, array $fields): array
+function about_page_normalize_rows(mixed $rows, array $default, array $fields, array $preserveFields = []): array
 {
     if (! is_array($rows) || $rows === []) {
         return $default;
@@ -273,6 +286,14 @@ function about_page_normalize_rows(mixed $rows, array $default, array $fields): 
             $entry[$field] = $field === 'text' || $field === 'description'
                 ? homepage_textarea($row[$field] ?? '')
                 : homepage_text($row[$field] ?? '');
+        }
+
+        foreach ($preserveFields as $field) {
+            $value = homepage_text($row[$field] ?? '');
+
+            if ($value !== '') {
+                $entry[$field] = $value;
+            }
         }
 
         $normalized[] = $entry;
@@ -297,12 +318,15 @@ function about_page_content_from_post(array $post): array
     $rowsFromPost = [];
     $columnKeys = about_page_post_column_keys();
 
+    $preserve = about_page_row_preserve_fields();
+
     foreach (about_page_row_fields() as $key => $fields) {
         $columnKey = $columnKeys[$key] ?? $key;
         $rowsFromPost[$key] = about_page_rows_from_post(
             is_array($post[$columnKey] ?? null) ? $post[$columnKey] : [],
             $fields,
-            $default[$key]
+            $default[$key],
+            $preserve[$key] ?? []
         );
     }
 
@@ -342,7 +366,7 @@ function about_page_content_from_post(array $post): array
     ];
 }
 
-function about_page_rows_from_post(array $columns, array $fields, array $default): array
+function about_page_rows_from_post(array $columns, array $fields, array $default, array $preserveFields = []): array
 {
     $count = 0;
 
@@ -370,6 +394,14 @@ function about_page_rows_from_post(array $columns, array $fields, array $default
 
             if ($value !== '') {
                 $hasContent = true;
+            }
+        }
+
+        foreach ($preserveFields as $field) {
+            $value = homepage_text($columns[$field][$i] ?? '');
+
+            if ($value !== '') {
+                $row[$field] = $value;
             }
         }
 
