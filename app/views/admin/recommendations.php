@@ -90,11 +90,24 @@ ob_start();
             </thead>
             <tbody>
               <?php foreach ($submissions as $submission): ?>
+                <?php
+                  $photoPath = trim((string) ($submission['photo_path'] ?? ''));
+                  $socialUrl = recommendation_public_social_url($submission['social_url'] ?? '');
+                ?>
                 <tr>
                   <td>
                     <strong><?= e($submission['name'] ?? '') ?></strong>
                     <br><span class="muted"><?= e($submission['designation'] ?? '') ?></span>
                     <br><span class="muted"><?= e($submission['email'] ?? '') ?></span>
+                    <?php if ($socialUrl !== ''): ?>
+                      <br><a class="muted recommendation-link" href="<?= e($socialUrl) ?>" target="_blank" rel="noopener">Social profile</a>
+                    <?php endif; ?>
+                    <?php if ($photoPath !== ''): ?>
+                      <a class="recommendation-photo" href="<?= e(asset($photoPath)) ?>" target="_blank" rel="noopener">
+                        <img src="<?= e(asset($photoPath)) ?>" alt="<?= e('Photo submitted by ' . ($submission['name'] ?? 'visitor')) ?>">
+                        <span>View photo</span>
+                      </a>
+                    <?php endif; ?>
                   </td>
                   <td style="max-width:320px;"><?= e($submission['quote'] ?? '') ?></td>
                   <td>

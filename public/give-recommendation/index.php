@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect($refererPath);
 }
 
-$result = recommendation_submit($_POST);
+$result = recommendation_submit($_POST, $_FILES);
 
 if ($result['ok'] === true) {
     if ($wantsJson) {

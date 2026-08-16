@@ -421,6 +421,67 @@ function upload_seo_image(string $fieldName, string $currentPath, array &$errors
     return 'uploads/seo/' . $filename;
 }
 
+function upload_recommendation_photo(string $fieldName, array $files, array &$errors): string
+{
+    if (empty($files[$fieldName]) || ! is_array($files[$fieldName])) {
+        return '';
+    }
+
+    $file = $files[$fieldName];
+
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return '';
+    }
+
+    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        $errors[] = 'The photo upload failed. Please use a JPG, PNG, or WebP image up to 5 MB.';
+        return '';
+    }
+
+    $tmpName = (string) ($file['tmp_name'] ?? '');
+
+    if ($tmpName === '' || ! is_uploaded_file($tmpName)) {
+        $errors[] = 'Invalid photo upload.';
+        return '';
+    }
+
+    if ((int) ($file['size'] ?? 0) > 5 * 1024 * 1024) {
+        $errors[] = 'Photos must be 5 MB or smaller.';
+        return '';
+    }
+
+    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($tmpName);
+    $extensions = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+
+    if (! isset($extensions[$mime]) || @getimagesize($tmpName) === false) {
+        $errors[] = 'Only valid JPG, PNG, and WebP photos are allowed.';
+        return '';
+    }
+
+    $directory = PUBLIC_PATH . '/uploads/recommendations';
+
+    if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+        $errors[] = 'Unable to create the recommendation upload directory.';
+        return '';
+    }
+
+    $filename = date('YmdHis') . '-' . bin2hex(random_bytes(6)) . '.' . $extensions[$mime];
+    $target = $directory . '/' . $filename;
+
+    if (! move_uploaded_file($tmpName, $target)) {
+        $errors[] = 'Unable to store the uploaded photo.';
+        return '';
+    }
+
+    @chmod($target, 0644);
+
+    return 'uploads/recommendations/' . $filename;
+}
+
 function upload_event_poster(string $fieldName, string $currentPath, array &$errors): string
 {
     if (empty($_FILES[$fieldName]) || ! is_array($_FILES[$fieldName])) {

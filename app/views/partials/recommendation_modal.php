@@ -42,7 +42,7 @@ $autoOpen = $type !== '' || isset($_GET['recommendation']);
         <?php endforeach; ?>
       </div>
 
-      <form class="meeting-form" id="recommendationForm" method="post" action="<?= e(url_path('give-recommendation/')) ?>">
+      <form class="meeting-form" id="recommendationForm" method="post" action="<?= e(url_path('give-recommendation/')) ?>" enctype="multipart/form-data">
         <?= public_csrf_field() ?>
         <input class="hp-field" type="text" name="recommendation_reference" tabindex="-1" autocomplete="new-password" aria-hidden="true">
 
@@ -64,7 +64,17 @@ $autoOpen = $type !== '' || isset($_GET['recommendation']);
 
           <label class="full">
             <span>Your recommendation</span>
-            <textarea name="quote" rows="4" maxlength="600" required placeholder="Share a short recommendation..."><?= e($old['quote'] ?? '') ?></textarea>
+            <textarea class="recommendation-quote-field" name="quote" rows="2" maxlength="600" required placeholder="Share a short recommendation..."><?= e($old['quote'] ?? '') ?></textarea>
+          </label>
+
+          <label>
+            <span>Photo <em>(optional)</em></span>
+            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp">
+          </label>
+
+          <label>
+            <span>Social media link <em>(optional)</em></span>
+            <input type="url" name="social_url" value="<?= e($old['social_url'] ?? '') ?>" maxlength="500" placeholder="https://www.linkedin.com/in/your-profile">
           </label>
         </div>
 
